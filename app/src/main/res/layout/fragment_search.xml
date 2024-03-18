@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/backgroundColor">
+
+    <!-- edit text to search songs-->
+    <EditText
+        android:id="@+id/idEdtSearch"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"
+        android:layout_margin="10dp"
+        android:background="@drawable/round_background"
+        android:hint="Search songs and ablums"
+        android:padding="15dp"
+        android:textColor="@color/lightText"
+        android:drawableStart="@drawable/search"
+        android:drawablePadding="10dp"
+        android:textStyle="bold"
+        />
+    <!-- recycler view t display search ablums results-->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/idRVAblums"
+        android:layout_below="@+id/idEdtSearch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:listitem="@layout/album_item" />
+
+    <!-- recycler view t display search songs results-->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/idRVSongs"
+        android:layout_below="@+id/idRVAblums"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:listitem="@layout/song_item" />
+</RelativeLayout>
