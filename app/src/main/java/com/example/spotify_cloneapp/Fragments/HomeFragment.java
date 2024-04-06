@@ -1,14 +1,21 @@
 package com.example.spotify_cloneapp.Fragments;
 
+import android.app.Activity;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.spotify_cloneapp.APIs.Service;
+import com.example.spotify_cloneapp.Adapters.AlbumAdapter;
+import com.example.spotify_cloneapp.Models.Album;
 import com.example.spotify_cloneapp.R;
+
+import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -27,9 +34,16 @@ public class HomeFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-
-
     private CircleImageView avatar;
+
+    private Service service;
+    private RecyclerView recommendedAlbumRView;
+    private RecyclerView popularAlbumRView;
+    private RecyclerView trendingAlbum;
+
+    private AlbumAdapter recommendedAlbumAdapter;
+    private AlbumAdapter popularAlbumAdapter;
+    private AlbumAdapter trendingAlbumAdapter;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -65,8 +79,36 @@ public class HomeFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_home, container, false);
+        this.loadComponent(view);
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_home, container, false);
+        return view;
 
+    }
+
+    public void loadComponent(View view){
+        recommendedAlbumRView =view.findViewById(R.id.idRVAlbums);
+        popularAlbumRView =view.findViewById(R.id.idRVPopularAlbums);
+        trendingAlbum =view.findViewById(R.id.idRVTrendingAlbums);
+
+        recommendedAlbumAdapter= new AlbumAdapter();
+        popularAlbumAdapter=new AlbumAdapter();
+        trendingAlbumAdapter=new AlbumAdapter();
+
+        recommendedAlbumRView.setAdapter(recommendedAlbumAdapter);
+        popularAlbumRView.setAdapter(popularAlbumAdapter);
+        trendingAlbum.setAdapter(trendingAlbumAdapter);
+
+    }
+
+    public void loadData(List<Album> albumList){
+        recommendedAlbumAdapter.setAlbumList(albumList);
+        popularAlbumAdapter.setAlbumList(albumList);
+        trendingAlbumAdapter.setAlbumList(albumList);
+    }
+    public void notifyDataChange(){
+        recommendedAlbumAdapter.notifyDataSetChanged();
+        popularAlbumAdapter.notifyDataSetChanged();
+        trendingAlbumAdapter.notifyDataSetChanged();
     }
 }
