@@ -11,6 +11,7 @@ import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
+import retrofit2.http.Query;
 
 public interface Service {
     String BASE_SONG_URL = "https://spotifybygoats.000webhostapp.com/Server/";
@@ -28,4 +29,8 @@ public interface Service {
     Call<List<Song>> getAllSong();
     @GET("Album.php")
     Call<List<Album>> getAllAlbum();
+    @GET("Song.php")
+    Call<List<Song>> getSongsByAlbum(@Query("idAlbum") int idAlbum);
+    @GET("Album.php")
+    Call<List<Album>> getAlbumById(@Query("idAlbum") int idAlbum);
 }
