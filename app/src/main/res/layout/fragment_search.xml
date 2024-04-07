@@ -34,9 +34,10 @@
     <!-- recycler view t display search songs results-->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/idRVSongs"
-        android:layout_below="@+id/idRVAblums"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/idRVAblums"
+        android:layout_marginTop="-3dp"
         android:orientation="vertical"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:listitem="@layout/song_item" />
