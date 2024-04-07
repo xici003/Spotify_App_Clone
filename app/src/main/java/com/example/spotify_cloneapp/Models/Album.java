@@ -1,5 +1,10 @@
 package com.example.spotify_cloneapp.Models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import androidx.annotation.NonNull;
+
 public class Album {
     private int ID_Album;
     private String Name;
@@ -56,4 +61,5 @@ public class Album {
     public int getDownloadState() {
         return DownloadState;
     }
+
 }

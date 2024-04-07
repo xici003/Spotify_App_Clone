@@ -1,6 +1,7 @@
 package com.example.spotify_cloneapp.Fragments;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -12,6 +13,7 @@ import android.view.ViewGroup;
 
 import com.example.spotify_cloneapp.APIs.Service;
 import com.example.spotify_cloneapp.Adapters.AlbumAdapter;
+import com.example.spotify_cloneapp.AlbumDetailActivity;
 import com.example.spotify_cloneapp.Models.Album;
 import com.example.spotify_cloneapp.R;
 
@@ -36,7 +38,6 @@ public class HomeFragment extends Fragment {
     private String mParam2;
     private CircleImageView avatar;
 
-    private Service service;
     private RecyclerView recommendedAlbumRView;
     private RecyclerView popularAlbumRView;
     private RecyclerView trendingAlbum;
@@ -44,6 +45,8 @@ public class HomeFragment extends Fragment {
     private AlbumAdapter recommendedAlbumAdapter;
     private AlbumAdapter popularAlbumAdapter;
     private AlbumAdapter trendingAlbumAdapter;
+
+    private int recommendedAlbumSelectedId;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -75,6 +78,7 @@ public class HomeFragment extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

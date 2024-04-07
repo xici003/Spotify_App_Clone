@@ -47,11 +47,13 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.SongViewHold
         holder.name.setText(album.getName());
         holder.detail.setText(album.getDescription());
         if (albumList.get(position).getThumbnail() != null) {
-            Picasso.get().load(album.getThumbnail()).into(holder.thumbnail);
+            Picasso.get().load(album.getThumbnail()).placeholder(R.drawable.hinhnen).into(holder.thumbnail);
 
+        } else {
+            holder.thumbnail.setImageResource(R.drawable.hinhnen);
         }
         //mo chi tiet album
-        holder.thumbnail.setOnClickListener(new View.OnClickListener() {
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), AlbumDetailActivity.class);

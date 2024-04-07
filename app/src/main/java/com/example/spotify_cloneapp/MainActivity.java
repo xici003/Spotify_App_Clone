@@ -12,9 +12,9 @@ import com.example.spotify_cloneapp.Fragments.FavoriteFragment;
 import com.example.spotify_cloneapp.Fragments.HomeFragment;
 import com.example.spotify_cloneapp.Fragments.SearchFragment;
 import com.example.spotify_cloneapp.Models.Album;
+import com.example.spotify_cloneapp.Models.Song;
 import com.example.spotify_cloneapp.databinding.ActivityMainBinding;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -37,25 +37,26 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         homeFragment= new HomeFragment();
-        loadDataRecommendAlbum();
-        replaceFragment(homeFragment);
-
         searchFragment=new SearchFragment();
         favoriteFragment=new FavoriteFragment();
+        replaceFragment(homeFragment);
+        loadHomeAlbum();
+
 
         // Bottom Navigation View
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
             if (itemId == MENU_HOME_ID) {
-                loadDataRecommendAlbum();
-                homeFragment.notifyDataChange();
                 replaceFragment(homeFragment);
+                loadHomeAlbum();
             }
             if (itemId == MENU_SEARCH_ID) {
                 replaceFragment(searchFragment);
             }
             if (itemId == MENU_FAVOURITE_ID) {
                 replaceFragment(favoriteFragment);
+                loadFavoriteSong();
+
             }
             return true;
         });
@@ -69,8 +70,7 @@ public class MainActivity extends AppCompatActivity {
         fragmentTransaction.commit();
     }
 
-    private void loadDataRecommendAlbum() {
-
+    private void loadHomeAlbum() {
         Service.api.getAllAlbum().enqueue(new Callback<List<Album>>() {
             @Override
             public void onResponse(Call<List<Album>> call, Response<List<Album>> response) {
@@ -83,6 +83,23 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<List<Album>> call, Throwable t) {
+
+            }
+        });
+    }
+    private void loadFavoriteSong(){
+        Service.api.getAllSong().enqueue(new Callback<List<Song>>() {
+            @Override
+            public void onResponse(Call<List<Song>> call, Response<List<Song>> response) {
+                if(response.isSuccessful()){
+                    List<Song> data= response.body();
+                    favoriteFragment.loadData(data);
+                    favoriteFragment.notifyDataChange();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Song>> call, Throwable t) {
 
             }
         });

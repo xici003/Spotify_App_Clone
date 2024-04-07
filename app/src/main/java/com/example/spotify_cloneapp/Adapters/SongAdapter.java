@@ -1,5 +1,7 @@
 package com.example.spotify_cloneapp.Adapters;
 
+import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -7,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.spotify_cloneapp.Models.Song;
+import com.example.spotify_cloneapp.MusicplayerViewActivity;
 import com.example.spotify_cloneapp.R;
 import com.squareup.picasso.Picasso;
 
@@ -32,14 +35,23 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
     }
 
     @Override
-    public void onBindViewHolder(SongViewHolder holder, int position) {
+    public void onBindViewHolder(SongViewHolder holder, @SuppressLint("RecyclerView") int position) {
         Song song = songList.get(position);
         // Đặt hình ảnh và các sự kiện khác ở đây
         holder.name.setText(song.getNameSong());
         holder.artist.setText(song.getNameArtist());
         if (songList.get(position).getThumbnail() != null) {
-            Picasso.get().load(song.getThumbnail()).into(holder.thumbnail);
+            Picasso.get().load(song.getThumbnail()).placeholder(R.drawable.hinhnen).into(holder.thumbnail);
         }
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Song playSong=songList.get(position);
+                Intent intent=new Intent(v.getContext(), MusicplayerViewActivity.class);
+                intent.putExtra("playSong",playSong.getID_Song());
+                v.getContext().startActivity(intent);
+            }
+        });
     }
 
     @Override
@@ -54,7 +66,6 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
 
         public SongViewHolder(View view) {
             super(view);
-            // Khởi tạo các thành phần giao diện người dùng khác ở đây
             name=view.findViewById(R.id.txtSongName);
             artist=view.findViewById(R.id.txtSongArtist);
             thumbnail=view.findViewById(R.id.idImgSong);
