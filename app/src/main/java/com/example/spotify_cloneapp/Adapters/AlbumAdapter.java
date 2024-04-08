@@ -29,7 +29,8 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.SongViewHold
         this.albumList = albumList;
     }
 
-    public void setAlbumList(List<Album> albumList) {
+    public void
+    setAlbumList(List<Album> albumList) {
         this.albumList.addAll(albumList);
     }
 

@@ -22,6 +22,9 @@
             android:name=".AlbumDetailActivity"
             android:exported="false" />
         <activity
+            android:name=".MusicPlayerActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="false" />
         <activity

@@ -1,5 +1,6 @@
 package com.example.spotify_cloneapp.Adapters;
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -7,6 +8,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.spotify_cloneapp.Models.Song;
+import com.example.spotify_cloneapp.MusicPlayerActivity;
 import com.example.spotify_cloneapp.R;
 import com.squareup.picasso.Picasso;
 
@@ -40,6 +42,15 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
         if (songList.get(position).getThumbnail() != null) {
             Picasso.get().load(song.getThumbnail()).into(holder.thumbnail);
         }
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), MusicPlayerActivity.class);
+                intent.putExtra("idSong",song.getID_Song());
+                v.getContext().startActivity(intent);
+            }
+        });
     }
 
     @Override
