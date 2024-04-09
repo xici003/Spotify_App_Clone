@@ -50,10 +50,12 @@
             android:layout_gravity="center"
             android:layout_marginTop="25dp"
             android:src="@drawable/hinhnen"/>
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp">
+
             <TextView
                 android:id="@+id/MV_txtNameSong"
                 android:layout_width="match_parent"
@@ -95,8 +97,7 @@
                 android:layout_marginTop="15dp"
                 android:layout_marginEnd="15dp"
                 android:padding="10dp"
-                android:src="@drawable/add_icon"
-                />
+                android:src="@drawable/add_icon" />
         </RelativeLayout>
 
         <SeekBar
@@ -178,10 +179,17 @@
             android:layout_height="300dp"
             android:backgroundTint="@color/lightText"
             android:background="@drawable/rounded_corners_background"
+            android:orientation="vertical"
             android:layout_margin="20dp">
             <TextView
                 android:id="@+id/MV_playlist"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
+                android:textStyle="bold"
+                android:textColor="@color/baseColor"
+                android:textSize="24dp"
+                android:layout_margin="15dp"
+                android:gravity="left"
+                android:text="aaa"
                 android:layout_height="wrap_content"/>
 
         </LinearLayout>

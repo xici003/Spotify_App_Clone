@@ -10,10 +10,13 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.spotify_cloneapp.APIs.Service;
+import com.example.spotify_cloneapp.Adapters.SongAdapter;
+import com.example.spotify_cloneapp.Models.Album;
 import com.example.spotify_cloneapp.Models.Song;
 import com.squareup.picasso.Picasso;
 
@@ -26,9 +29,8 @@ import retrofit2.Response;
 public class MusicPlayerActivity extends AppCompatActivity {
 
     private Song song;
-
     int position = 0;
-    private TextView albumName,songName,artistName,durationPlayed,durationTotal;
+    private TextView albumName,songName,artistName,lyrics,durationPlayed,durationTotal;
     private ImageView imgSong, playPauseBtn, nextBtn, prevBtn;
     private SeekBar seekBar;
     static Uri uri;
@@ -36,6 +38,10 @@ public class MusicPlayerActivity extends AppCompatActivity {
     private Handler handler = new Handler();
 
     private Thread playThread, prevThread, nextThread;
+
+    private boolean apiCalled = false;
+    boolean isSeeking = false;
+
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_musicplayer_view);
@@ -45,55 +51,56 @@ public class MusicPlayerActivity extends AppCompatActivity {
         if(intent != null){
             int idSong = intent.getIntExtra("idSong",position);
 
-            Service.api.getSongsById(idSong).enqueue(new Callback<List<Song>>() {
+            if(!apiCalled){
+                Service.api.getSongsById(idSong).enqueue(new Callback<List<Song>>() {
+                    @Override
+                    public void onResponse(Call<List<Song>> call, Response<List<Song>> response) {
+                        if(response.body().size()>0) {
+                            song = response.body().get(position);
+                            loadData();
+                            getMusicPlayer();
+                            apiCalled = true;
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<List<Song>> call, Throwable t) {
+
+                    }
+                });
+            }
+
+            seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 @Override
-                public void onResponse(Call<List<Song>> call, Response<List<Song>> response) {
-                    if(response.body().size()>0) {
-                        song = response.body().get(position);
-
-                        loadData();
-                        getMusicPlayer();
-                        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                            @Override
-                            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                                if(mediaPlayer != null){
-                                    mediaPlayer.seekTo(progress * 1000);
-                                }
-                            }
-
-                            @Override
-                            public void onStartTrackingTouch(SeekBar seekBar) {
-
-                            }
-
-                            @Override
-                            public void onStopTrackingTouch(SeekBar seekBar) {
-
-                            }
-                        });
-
-                        MusicPlayerActivity.this.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if(mediaPlayer != null){
-                                    int mCurrentPosition = mediaPlayer.getCurrentPosition() / 1000;
-                                    seekBar.setProgress(mCurrentPosition);
-                                    durationPlayed.setText(formattedTime(mCurrentPosition));
-                                }
-
-                                handler.postDelayed(this, 1000);
-                            }
-                        });
-
+                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    if(fromUser && mediaPlayer != null){
+                        mediaPlayer.seekTo(progress * 1000);
                     }
                 }
 
                 @Override
-                public void onFailure(Call<List<Song>> call, Throwable t) {
+                public void onStartTrackingTouch(SeekBar seekBar) {
+
+                }
+
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {
 
                 }
             });
+            MusicPlayerActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if(mediaPlayer != null && !isSeeking){
+                        int mCurrentPosition = mediaPlayer.getCurrentPosition() / 1000;
+                        seekBar.setProgress(mCurrentPosition);
+                        durationPlayed.setText(formattedTime(mCurrentPosition));
+                        isSeeking = false;
+                    }
 
+                    handler.postDelayed(this, 1000);
+                }
+            });
         }
 
 
@@ -104,6 +111,69 @@ public class MusicPlayerActivity extends AppCompatActivity {
         playThreadBtn();
         super.onResume();
     }
+
+//    private void nextThreadBtn() {
+//        nextThread = new Thread(){
+//            @Override
+//            public void run() {
+//                super.run();
+//                nextBtn.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View v) {
+//                        nextBtnClicked();
+//                    }
+//                });
+//            }
+//        };
+//        nextThread.start();
+//    }
+//
+//    private void nextBtnClicked() {
+//        if(mediaPlayer.isPlaying()){
+//            mediaPlayer.stop();
+//            mediaPlayer.release();
+//            position = ((position + 1) % songsOfAlbumAdapter.getItemCount());
+//            uri = Uri.parse(this.song.getURLmp3());
+//            mediaPlayer = MediaPlayer.create(getApplicationContext(),uri);
+//            loadData();
+//            seekBar.setMax(mediaPlayer.getDuration() / 1000);
+//            MusicPlayerActivity.this.runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    if (mediaPlayer != null) {
+//                        int mCurrPosition = mediaPlayer.getCurrentPosition() / 1000;
+//                        seekBar.setProgress(mCurrPosition);
+//                    }
+//                    handler.postDelayed(this, 1000);
+//                }
+//            });
+//
+//            playPauseBtn.setImageResource(R.drawable.pause_icon);
+//            mediaPlayer.start();
+//        }else {
+//            mediaPlayer.stop();
+//            mediaPlayer.release();
+//            position = ((position + 1) % songsOfAlbumAdapter.getItemCount());
+//            uri = Uri.parse(this.song.getURLmp3());
+//            mediaPlayer = MediaPlayer.create(getApplicationContext(),uri);
+//            loadData();
+//            seekBar.setMax(mediaPlayer.getDuration() / 1000);
+//            MusicPlayerActivity.this.runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    if (mediaPlayer != null) {
+//                        int mCurrPosition = mediaPlayer.getCurrentPosition() / 1000;
+//                        seekBar.setProgress(mCurrPosition);
+//                    }
+//                    handler.postDelayed(this, 1000);
+//                }
+//            });
+//
+//            playPauseBtn.setImageResource(R.drawable.play2_icon);
+//            mediaPlayer.start();
+//        }
+//    }
+
     private void playThreadBtn() {
         playThread = new Thread(){
             @Override
@@ -157,6 +227,7 @@ public class MusicPlayerActivity extends AppCompatActivity {
         imgSong = findViewById(R.id.MV_imgSong);
         songName = findViewById(R.id.MV_txtNameSong);
         artistName = findViewById(R.id.MV_txtNameArtist);
+        lyrics = findViewById(R.id.MV_playlist);
         playPauseBtn = findViewById(R.id.MV_playIcon);
         nextBtn = findViewById(R.id.MV_nextIcon);
         prevBtn = findViewById(R.id.MV_prevIcon);
@@ -171,6 +242,7 @@ public class MusicPlayerActivity extends AppCompatActivity {
         if(this.song.getThumbnail()!=null){
             Picasso.get().load(this.song.getThumbnail()).into(imgSong);
         }
+        lyrics.setText(this.song.getLyrics());
     }
 
     protected void getMusicPlayer(){

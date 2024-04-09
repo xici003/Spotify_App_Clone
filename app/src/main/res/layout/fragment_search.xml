@@ -12,7 +12,7 @@
         android:id="@+id/idEdtSearch"
         android:layout_width="match_parent"
         android:layout_height="55dp"
-        android:layout_margin="10dp"
+        android:layout_margin="20dp"
         android:background="@drawable/round_background"
         android:hint="Search songs and ablums"
         android:padding="15dp"
@@ -21,13 +21,40 @@
         android:drawablePadding="10dp"
         android:textStyle="bold"
         />
+    <ViewFlipper
+        android:id="@+id/viewFlipper"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:layout_below="@+id/idEdtSearch"
+        android:flipInterval="2000"
+        android:autoStart="true"
+        android:inAnimation="@android:anim/slide_in_left"
+        android:outAnimation="@android:anim/slide_out_right">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/poster1"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/poster2"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/poster3"/>
+
+    </ViewFlipper>
     <!-- recycler view t display search ablums results-->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/idRVAblums"
-        android:layout_below="@+id/idEdtSearch"
+        android:layout_below="@+id/viewFlipper"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:layout_margin="10dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:listitem="@layout/album_item" />
 
@@ -38,6 +65,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:layout_margin="10dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         tools:listitem="@layout/song_item" />
 </RelativeLayout>

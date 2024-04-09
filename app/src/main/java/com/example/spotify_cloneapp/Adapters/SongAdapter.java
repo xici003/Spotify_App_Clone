@@ -7,6 +7,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.spotify_cloneapp.Models.Album;
 import com.example.spotify_cloneapp.Models.Song;
 import com.example.spotify_cloneapp.MusicPlayerActivity;
 import com.example.spotify_cloneapp.R;

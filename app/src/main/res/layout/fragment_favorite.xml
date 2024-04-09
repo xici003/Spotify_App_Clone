@@ -69,14 +69,14 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical">
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/idRVSongs"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginStart="4dp"
                 android:layout_marginTop="15dp"
@@ -88,7 +88,7 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/idRVArtists"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginStart="4dp"
                 android:layout_marginTop="15dp"
@@ -96,6 +96,50 @@
                 android:layout_marginBottom="4dp"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 tools:listitem="@layout/artist_item" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="4dp"
+                android:layout_marginLeft="10dp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="50dp"
+                    android:layout_height="60dp"
+                    android:src="@drawable/add_icon"/>
+                <TextView
+                    android:layout_width="300dp"
+                    android:layout_height="60dp"
+                    android:layout_marginLeft="15dp"
+                    android:textColor="@color/white"
+                    android:gravity="center_vertical"
+                    android:textSize="18sp"
+                    android:text="Add favorite artists"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="4dp"
+                android:layout_marginLeft="10dp"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="50dp"
+                    android:layout_height="60dp"
+                    android:src="@drawable/add_icon"/>
+                <TextView
+                    android:layout_width="300dp"
+                    android:layout_height="60dp"
+                    android:layout_marginLeft="15dp"
+                    android:textColor="@color/white"
+                    android:gravity="center_vertical"
+                    android:textSize="18sp"
+                    android:text="Add favorite postcards or playlists"/>
+            </LinearLayout>
 
         </LinearLayout>
 
