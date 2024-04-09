@@ -1,10 +1,12 @@
 package com.example.spotify_cloneapp;
 
 import android.content.Intent;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -24,14 +26,16 @@ import retrofit2.Response;
 public class MusicPlayerActivity extends AppCompatActivity {
 
     private Song song;
-    private TextView albumName,songName,artistName,durationPlayed;
-    private ImageView imgSong, playPauseBtn;
+
+    int position = 0;
+    private TextView albumName,songName,artistName,durationPlayed,durationTotal;
+    private ImageView imgSong, playPauseBtn, nextBtn, prevBtn;
     private SeekBar seekBar;
     static Uri uri;
     static MediaPlayer mediaPlayer;
+    private Handler handler = new Handler();
 
-    static Handler handler = new Handler();
-
+    private Thread playThread, prevThread, nextThread;
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_musicplayer_view);
@@ -39,29 +43,16 @@ public class MusicPlayerActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         if(intent != null){
-            int idSong = intent.getIntExtra("idSong",0);
+            int idSong = intent.getIntExtra("idSong",position);
 
             Service.api.getSongsById(idSong).enqueue(new Callback<List<Song>>() {
                 @Override
                 public void onResponse(Call<List<Song>> call, Response<List<Song>> response) {
                     if(response.body().size()>0) {
-                        song = response.body().get(0);
+                        song = response.body().get(position);
+
                         loadData();
                         getMusicPlayer();
-
-                        MusicPlayerActivity.this.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                if(mediaPlayer != null){
-                                    int mCurrentPosition = mediaPlayer.getCurrentPosition() / 1000;
-                                    seekBar.setProgress(mCurrentPosition);
-                                    durationPlayed.setText(formattedTime(mCurrentPosition));
-                                }
-
-                                handler.postDelayed(this, 1000);
-                            }
-                        });
-
                         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                             @Override
                             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -81,6 +72,19 @@ public class MusicPlayerActivity extends AppCompatActivity {
                             }
                         });
 
+                        MusicPlayerActivity.this.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                if(mediaPlayer != null){
+                                    int mCurrentPosition = mediaPlayer.getCurrentPosition() / 1000;
+                                    seekBar.setProgress(mCurrentPosition);
+                                    durationPlayed.setText(formattedTime(mCurrentPosition));
+                                }
+
+                                handler.postDelayed(this, 1000);
+                            }
+                        });
+
                     }
                 }
 
@@ -89,9 +93,63 @@ public class MusicPlayerActivity extends AppCompatActivity {
 
                 }
             });
+
         }
 
 
+    }
+
+    @Override
+    protected void onResume() {
+        playThreadBtn();
+        super.onResume();
+    }
+    private void playThreadBtn() {
+        playThread = new Thread(){
+            @Override
+            public void run() {
+                super.run();
+                playPauseBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        playPauseBtnClicked();
+                    }
+                });
+            }
+        };
+        playThread.start();
+    }
+
+    private void playPauseBtnClicked() {
+        if(mediaPlayer.isPlaying()){
+            playPauseBtn.setImageResource(R.drawable.play2_icon);
+            mediaPlayer.pause();
+            seekBar.setMax(mediaPlayer.getDuration() / 1000);
+            MusicPlayerActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (mediaPlayer != null) {
+                        int mCurrPosition = mediaPlayer.getCurrentPosition() / 1000;
+                        seekBar.setProgress(mCurrPosition);
+                    }
+                    handler.postDelayed(this, 1000);
+                }
+            });
+        }else{
+            playPauseBtn.setImageResource(R.drawable.pause_icon);
+            mediaPlayer.start();
+            seekBar.setMax(mediaPlayer.getDuration()/1000);
+            MusicPlayerActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (mediaPlayer != null) {
+                        int mCurrPosition = mediaPlayer.getCurrentPosition() / 1000;
+                        seekBar.setProgress(mCurrPosition);
+                    }
+                    handler.postDelayed(this, 1000);
+                }
+            });
+        }
     }
 
     protected void loadComponent(){
@@ -100,8 +158,11 @@ public class MusicPlayerActivity extends AppCompatActivity {
         songName = findViewById(R.id.MV_txtNameSong);
         artistName = findViewById(R.id.MV_txtNameArtist);
         playPauseBtn = findViewById(R.id.MV_playIcon);
+        nextBtn = findViewById(R.id.MV_nextIcon);
+        prevBtn = findViewById(R.id.MV_prevIcon);
         seekBar = findViewById(R.id.MV_seekBar);
         durationPlayed = findViewById(R.id.MV_durationPlayed);
+        durationTotal = findViewById(R.id.MV_durationTotal);
     }
 
     protected void  loadData(){
@@ -131,6 +192,8 @@ public class MusicPlayerActivity extends AppCompatActivity {
         }
 
         seekBar.setMax(mediaPlayer.getDuration() / 1000);
+
+        durationTotal.setText(this.song.getDuration());
     }
 
     private String formattedTime(int mCurrentPosition){
@@ -147,4 +210,5 @@ public class MusicPlayerActivity extends AppCompatActivity {
             return totalOut;
         }
     }
+
 }
