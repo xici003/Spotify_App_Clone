@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -12,6 +13,7 @@ import com.example.spotify_cloneapp.APIs.Service;
 import com.example.spotify_cloneapp.Adapters.SongAdapter;
 import com.example.spotify_cloneapp.Models.Album;
 import com.example.spotify_cloneapp.Models.Song;
+import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -52,7 +54,9 @@ public class AlbumDetailActivity extends AppCompatActivity {
             Service.api.getSongsByAlbum(idAlbum).enqueue(new Callback<List<Song>>() {
                 @Override
                 public void onResponse(Call<List<Song>> call, Response<List<Song>> response) {
-                    songsOfAlbumAdapter.setSongList(response.body());
+                    List<Song> songs=response.body();
+                    songsOfAlbumAdapter.setSongList(songs);
+                    saveQueueofSongs(songs);
                     songsOfAlbumAdapter.notifyDataSetChanged();
                 }
 
@@ -79,5 +83,15 @@ public class AlbumDetailActivity extends AppCompatActivity {
         if(this.album.getThumbnail()!=null){
             Picasso.get().load(this.album.getThumbnail()).into(albumImageView);
         }
+        songsOfAlbumAdapter.setAlbumName(album.getName());
+
+    }
+    private void saveQueueofSongs(List<Song> list){
+        SharedPreferences prefs= getSharedPreferences(album.getName(), MODE_PRIVATE);
+        SharedPreferences.Editor editor=prefs.edit();
+        Gson gson=new Gson();
+        String json=gson.toJson(list);
+        editor.putString(album.getName(),json);
+        editor.apply();
     }
 }
