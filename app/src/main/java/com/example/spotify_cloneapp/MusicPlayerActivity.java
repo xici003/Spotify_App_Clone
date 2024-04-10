@@ -3,6 +3,7 @@ package com.example.spotify_cloneapp;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
@@ -223,8 +224,9 @@ public class MusicPlayerActivity extends AppCompatActivity {
 
     private void createService(Song song) {
         Intent intent = new Intent(this, MusicService.class);
-        Bundle b = new Bundle();
-        b.putSerializable("song", song);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("song", song);
+        intent.putExtras(bundle);
         startService(intent);
     }
 
