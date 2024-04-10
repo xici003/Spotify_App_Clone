@@ -8,7 +8,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.spotify_cloneapp.Models.Album;
 import com.example.spotify_cloneapp.Models.Song;
 import com.example.spotify_cloneapp.MusicPlayerActivity;
 import com.example.spotify_cloneapp.R;
@@ -20,6 +19,7 @@ import java.util.List;
 public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder> {
 
     private List<Song> songList;
+    private String albumName;
 
     public SongAdapter() {
         this.songList = new ArrayList<>();
@@ -42,7 +42,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
         holder.name.setText(song.getNameSong());
         holder.artist.setText(song.getNameArtist());
         if (songList.get(position).getThumbnail() != null) {
-            Picasso.get().load(song.getThumbnail()).into(holder.thumbnail);
+            Picasso.get().load(song.getThumbnail()).placeholder(R.drawable.hinhnen).into(holder.thumbnail);
         }
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -50,6 +50,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), MusicPlayerActivity.class);
                 intent.putExtra("idSong",song.getID_Song());
+                intent.putExtra("albumName", albumName);
                 v.getContext().startActivity(intent);
             }
         });
@@ -72,5 +73,13 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
             artist=view.findViewById(R.id.txtSongArtist);
             thumbnail=view.findViewById(R.id.idImgSong);
         }
+    }
+
+    public String getAlbumName() {
+        return albumName;
+    }
+
+    public void setAlbumName(String albumName) {
+        this.albumName = albumName;
     }
 }
