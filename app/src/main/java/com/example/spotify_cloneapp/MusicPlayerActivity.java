@@ -60,6 +60,7 @@ public class MusicPlayerActivity extends AppCompatActivity {
         if(intent != null){
             int idSong = intent.getIntExtra("idSong",position);
             String albumName = intent.getStringExtra("albumName");
+            this.albumName.setText(albumName);
             queue=getQueue(albumName);
 
             if(!apiCalled){
@@ -93,7 +94,6 @@ public class MusicPlayerActivity extends AppCompatActivity {
                 }
             });
         }
-
 
     }
 
@@ -198,7 +198,8 @@ public class MusicPlayerActivity extends AppCompatActivity {
             uri = Uri.parse(this.song.getURLmp3());
         }
 
-        if(mediaPlayer != null){
+        if(mediaPlayer != null)
+        {
             mediaPlayer.stop();
             mediaPlayer.release();
             mediaPlayer = new MediaPlayer();
@@ -209,6 +210,8 @@ public class MusicPlayerActivity extends AppCompatActivity {
                     @Override
                     public void onPrepared(MediaPlayer mp) {
                         mediaPlayer.start();
+                        seekBar.setMax(mediaPlayer.getDuration() / 1000);
+                        MusicPlayerActivity.this.runOnUiThread(updateSeekBar);
                         handler.postDelayed(updateSeekBar, 0); // Start updating the SeekBar
                     }
                 });
@@ -226,16 +229,23 @@ public class MusicPlayerActivity extends AppCompatActivity {
                     @Override
                     public void onPrepared(MediaPlayer mp) {
                         mediaPlayer.start();
+                        seekBar.setMax(mediaPlayer.getDuration() / 1000);
+                        MusicPlayerActivity.this.runOnUiThread(updateSeekBar);
                         handler.postDelayed(updateSeekBar, 0); // Start updating the SeekBar
                     }
                 });
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    nextSong();
+                }
+            });
         }
+
         durationTotal.setText(this.song.getDuration());
-        seekBar.setMax(mediaPlayer.getDuration() / 1000);
-        MusicPlayerActivity.this.runOnUiThread(updateSeekBar);
     }
 
     private String formattedTime(int mCurrentPosition){
@@ -252,5 +262,4 @@ public class MusicPlayerActivity extends AppCompatActivity {
             return totalOut;
         }
     }
-
 }
