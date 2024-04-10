@@ -1,6 +1,8 @@
 package com.example.spotify_cloneapp.Models;
 
-public class Song {
+import java.io.Serializable;
+
+public class Song implements Serializable {
     private int ID_Song;
     private String Thumbnail;
     private String URLmp3;

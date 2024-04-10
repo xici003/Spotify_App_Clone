@@ -1,7 +1,6 @@
 package com.example.spotify_cloneapp;
 
 import android.content.Intent;
-import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -10,13 +9,10 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.spotify_cloneapp.APIs.Service;
-import com.example.spotify_cloneapp.Adapters.SongAdapter;
-import com.example.spotify_cloneapp.Models.Album;
 import com.example.spotify_cloneapp.Models.Song;
 import com.squareup.picasso.Picasso;
 
@@ -59,6 +55,7 @@ public class MusicPlayerActivity extends AppCompatActivity {
                             song = response.body().get(position);
                             loadData();
                             getMusicPlayer();
+                            createService(song);
                             apiCalled = true;
                         }
                     }
@@ -220,6 +217,15 @@ public class MusicPlayerActivity extends AppCompatActivity {
                 }
             });
         }
+
+
+    }
+
+    private void createService(Song song) {
+        Intent intent = new Intent(this, MusicService.class);
+        Bundle b = new Bundle();
+        b.putSerializable("song", song);
+        startService(intent);
     }
 
     protected void loadComponent(){
@@ -282,5 +288,4 @@ public class MusicPlayerActivity extends AppCompatActivity {
             return totalOut;
         }
     }
-
 }

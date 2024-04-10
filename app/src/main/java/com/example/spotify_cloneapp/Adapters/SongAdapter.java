@@ -1,6 +1,7 @@
 package com.example.spotify_cloneapp.Adapters;
 
 import android.content.Intent;
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,11 +46,17 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
             Picasso.get().load(song.getThumbnail()).into(holder.thumbnail);
         }
 
+        ArrayList<Integer> listIdSong = new ArrayList<>();
+        for (Song s:songList) {
+            listIdSong.add(s.getID_Song());
+        }
+
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), MusicPlayerActivity.class);
                 intent.putExtra("idSong",song.getID_Song());
+//                intent.putParcelableArrayListExtra("listSong", (ArrayList<? extends Parcelable>) songList);
                 v.getContext().startActivity(intent);
             }
         });
