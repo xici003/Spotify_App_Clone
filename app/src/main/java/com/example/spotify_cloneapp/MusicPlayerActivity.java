@@ -5,34 +5,29 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.spotify_cloneapp.APIs.Service;
-import com.example.spotify_cloneapp.Adapters.SongAdapter;
-import com.example.spotify_cloneapp.Models.Album;
 import com.example.spotify_cloneapp.Models.Song;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.List;
-import com.google.gson.reflect.TypeToken;
 
 public class MusicPlayerActivity extends AppCompatActivity {
 
     private Song song;
     int position = 0;
-    private TextView albumName,songName,artistName,lyrics,durationPlayed,durationTotal;
+    private TextView albumName, songName, artistName, lyrics, durationPlayed, durationTotal;
     private ImageView imgSong, playPauseBtn, nextBtn, prevBtn;
     private SeekBar seekBar;
     static Uri uri;
@@ -48,7 +43,7 @@ public class MusicPlayerActivity extends AppCompatActivity {
     private Runnable updateSeekBar = new Runnable() {
         @Override
         public void run() {
-            if(mediaPlayer != null){
+            if (mediaPlayer != null) {
                 int mCurrentPosition = mediaPlayer.getCurrentPosition() / 1000;
                 seekBar.setProgress(mCurrentPosition);
                 durationPlayed.setText(formattedTime(mCurrentPosition));
@@ -57,34 +52,35 @@ public class MusicPlayerActivity extends AppCompatActivity {
         }
     };
 
-    protected void onCreate(Bundle savedInstanceState){
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_musicplayer_view);
         loadComponent();
 
         Intent intent = getIntent();
-        if(intent != null){
-            int idSong = intent.getIntExtra("idSong",position);
+        if (intent != null) {
+            int idSong = intent.getIntExtra("idSong", position);
             String albumName = intent.getStringExtra("albumName");
             this.albumName.setText(albumName);
-            queue=getQueue(albumName);
+            queue = getQueue(albumName);
 
-            if(!apiCalled){
-                for(int i=0;i<queue.size();i++){
-                    if(queue.get(i).getID_Song()==idSong){
-                        song= queue.get(i);
+            if (!apiCalled) {
+                for (int i = 0; i < queue.size(); i++) {
+                    if (queue.get(i).getID_Song() == idSong) {
+                        song = queue.get(i);
                         break;
                     }
                 }
                 loadData();
                 getMusicPlayer();
+                createService(song);
                 apiCalled = true;
             }
 
             seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                    if(fromUser && mediaPlayer != null){
+                    if (fromUser && mediaPlayer != null) {
                         mediaPlayer.seekTo(progress * 1000);
                     }
                 }
@@ -108,14 +104,17 @@ public class MusicPlayerActivity extends AppCompatActivity {
         playThreadBtn();
         super.onResume();
     }
+
     public List<Song> getQueue(String key) {
         SharedPreferences prefs = getSharedPreferences(key, Context.MODE_PRIVATE);
         Gson gson = new Gson();
         String json = prefs.getString(key, null);
-        Type type = new TypeToken<List<Song>>() {}.getType();
+        Type type = new TypeToken<List<Song>>() {
+        }.getType();
         return gson.fromJson(json, type);
     }
-    private void setBtnNextandPre(){
+
+    private void setBtnNextandPre() {
         nextBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -129,8 +128,9 @@ public class MusicPlayerActivity extends AppCompatActivity {
             }
         });
     }
+
     private void playThreadBtn() {
-        playThread = new Thread(){
+        playThread = new Thread() {
             @Override
             public void run() {
                 super.run();
@@ -146,15 +146,15 @@ public class MusicPlayerActivity extends AppCompatActivity {
     }
 
     private void playPauseBtnClicked() {
-        if(mediaPlayer.isPlaying()){
+        if (mediaPlayer.isPlaying()) {
             playPauseBtn.setImageResource(R.drawable.play2_icon);
             mediaPlayer.pause();
             seekBar.setMax(mediaPlayer.getDuration() / 1000);
             MusicPlayerActivity.this.runOnUiThread(updateSeekBar);
-        }else{
+        } else {
             playPauseBtn.setImageResource(R.drawable.pause_icon);
             mediaPlayer.start();
-            seekBar.setMax(mediaPlayer.getDuration()/1000);
+            seekBar.setMax(mediaPlayer.getDuration() / 1000);
             MusicPlayerActivity.this.runOnUiThread(updateSeekBar);
         }
 
@@ -169,7 +169,7 @@ public class MusicPlayerActivity extends AppCompatActivity {
         startService(intent);
     }
 
-    protected void loadComponent(){
+    protected void loadComponent() {
         albumName = findViewById(R.id.MV_txtAlbumName);
         imgSong = findViewById(R.id.MV_imgSong);
         songName = findViewById(R.id.MV_txtNameSong);
@@ -184,37 +184,39 @@ public class MusicPlayerActivity extends AppCompatActivity {
         setBtnNextandPre();
 
     }
-    private void nextSong(){
-        int pos=queue.indexOf(song)+1;
-        pos%=queue.size();
-        song=queue.get(pos);
+
+    private void nextSong() {
+        int pos = queue.indexOf(song) + 1;
+        pos %= queue.size();
+        song = queue.get(pos);
         loadData();
         getMusicPlayer();
     }
-    private void prevSong(){
-        int pos =queue.indexOf(song)-1;
-        pos = pos ==-1? queue.size()-1: pos %queue.size();
-        song=queue.get(pos);
+
+    private void prevSong() {
+        int pos = queue.indexOf(song) - 1;
+        pos = pos == -1 ? queue.size() - 1 : pos % queue.size();
+        song = queue.get(pos);
         loadData();
         getMusicPlayer();
     }
-    protected void  loadData(){
+
+    protected void loadData() {
         songName.setText(this.song.getNameSong());
         artistName.setText(this.song.getNameArtist());
-        if(this.song.getThumbnail()!=null){
+        if (this.song.getThumbnail() != null) {
             Picasso.get().load(this.song.getThumbnail()).placeholder(R.drawable.hinhnen).into(imgSong);
         }
         lyrics.setText(this.song.getLyrics());
     }
 
-    protected void getMusicPlayer(){
-        if(this.song != null){
+    protected void getMusicPlayer() {
+        if (this.song != null) {
             playPauseBtn.setImageResource(R.drawable.pause_icon);
             uri = Uri.parse(this.song.getURLmp3());
         }
 
-        if(mediaPlayer != null)
-        {
+        if (mediaPlayer != null) {
             mediaPlayer.stop();
             mediaPlayer.release();
             mediaPlayer = new MediaPlayer();
@@ -233,9 +235,7 @@ public class MusicPlayerActivity extends AppCompatActivity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
-        else
-        {
+        } else {
             mediaPlayer = new MediaPlayer();
             try {
                 mediaPlayer.setDataSource(getApplicationContext(), uri);
@@ -263,7 +263,7 @@ public class MusicPlayerActivity extends AppCompatActivity {
         durationTotal.setText(this.song.getDuration());
     }
 
-    private String formattedTime(int mCurrentPosition){
+    private String formattedTime(int mCurrentPosition) {
         String totalOut = "";
         String totalNew = "";
         String seconds = String.valueOf(mCurrentPosition % 60);
@@ -271,9 +271,9 @@ public class MusicPlayerActivity extends AppCompatActivity {
         totalOut = minutes + ":" + seconds;
         totalNew = minutes + ":0" + seconds;
 
-        if(seconds.length() == 1){
+        if (seconds.length() == 1) {
             return totalNew;
-        }else{
+        } else {
             return totalOut;
         }
     }
