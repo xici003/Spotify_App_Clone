@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -18,6 +19,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -29,6 +31,7 @@ public class AlbumDetailActivity extends AppCompatActivity {
     private SongAdapter songsOfAlbumAdapter;
     private TextView albumNameTV;
     private TextView albumDescriptionTV;
+    private ImageView playAllSongs;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,15 +70,26 @@ public class AlbumDetailActivity extends AppCompatActivity {
             });
         }
     }
+    public void setPlayAllSongs(){
+        playAllSongs.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(AlbumDetailActivity.this,MusicPlayerActivity.class);
+                intent.putExtra("idSong",songsOfAlbumAdapter.getSongList().get(0).getID_Song());
+                intent.putExtra("albumName",album.getName());
+                startActivity(intent);
+            }
+        });
+    }
     protected void loadComponent(){
         albumImageView=findViewById(R.id.imgViewAlbum);
         songsOfAlbumRV=findViewById(R.id.idRVSongs);
         albumNameTV=findViewById(R.id.txtAlbumName);
         albumDescriptionTV=findViewById(R.id.txtArtistName);
-
+        playAllSongs=findViewById(R.id.idFaPlay); // Sửa lại ID của ImageView
         songsOfAlbumAdapter=new SongAdapter();
         songsOfAlbumRV.setAdapter(songsOfAlbumAdapter);
-
+        setPlayAllSongs();
     }
     protected void loadData(){
         albumNameTV.setText(this.album.getName());

@@ -28,6 +28,10 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
         this.songList.addAll(songList);
     }
 
+    public List<Song> getSongList() {
+        return songList;
+    }
+
     @Override
     public SongViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View itemView = LayoutInflater.from(parent.getContext())

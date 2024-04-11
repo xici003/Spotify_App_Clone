@@ -7,6 +7,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -82,6 +83,9 @@ public class MusicPlayerActivity extends AppCompatActivity {
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                     if (fromUser && mediaPlayer != null) {
                         mediaPlayer.seekTo(progress * 1000);
+                    }
+                    if(progress==seekBar.getMax()){
+                        nextSong();
                     }
                 }
 
@@ -181,6 +185,7 @@ public class MusicPlayerActivity extends AppCompatActivity {
         seekBar = findViewById(R.id.MV_seekBar);
         durationPlayed = findViewById(R.id.MV_durationPlayed);
         durationTotal = findViewById(R.id.MV_durationTotal);
+        lyrics.setMovementMethod(new ScrollingMovementMethod());
         setBtnNextandPre();
 
     }
@@ -208,6 +213,7 @@ public class MusicPlayerActivity extends AppCompatActivity {
             Picasso.get().load(this.song.getThumbnail()).placeholder(R.drawable.hinhnen).into(imgSong);
         }
         lyrics.setText(this.song.getLyrics());
+        lyrics.invalidate();
     }
 
     protected void getMusicPlayer() {
@@ -252,15 +258,8 @@ public class MusicPlayerActivity extends AppCompatActivity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mp) {
-                    nextSong();
-                }
-            });
         }
-
-        durationTotal.setText(this.song.getDuration());
+        durationTotal.setText(song.getDuration());
     }
 
     private String formattedTime(int mCurrentPosition) {

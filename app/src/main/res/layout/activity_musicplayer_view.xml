@@ -142,39 +142,44 @@
             android:layout_width="match_parent"
             android:layout_height="100dp"
             android:gravity="center">
+
             <ImageView
                 android:id="@+id/MV_prevIcon"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:src="@drawable/prev_icon"
-                android:layout_weight="1"/>
+                android:layout_gravity="center"
+                android:layout_marginRight="50dp"
+                android:src="@drawable/prev_icon" />
+
             <androidx.cardview.widget.CardView
                 android:layout_width="65dp"
                 android:layout_height="65dp"
-                app:cardBackgroundColor="@color/white"
-                app:cardCornerRadius="50dp"
                 android:outlineAmbientShadowColor="#7960E5"
-                android:outlineSpotShadowColor="#7960E5">
+                android:outlineSpotShadowColor="#7960E5"
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="50dp">
 
                 <ImageView
                     android:id="@+id/MV_playIcon"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:src="@drawable/play2_icon"
-                    android:layout_gravity="center"/>
+                    android:layout_gravity="center"
+                    android:src="@drawable/play2_icon" />
 
             </androidx.cardview.widget.CardView>
+
             <ImageView
                 android:id="@+id/MV_nextIcon"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:src="@drawable/next_icon"
-                android:layout_weight="1"/>
+                android:layout_gravity="center"
+                android:layout_marginLeft="50dp"
+                android:src="@drawable/next_icon" />
 
         </LinearLayout>
 
         <!--For playlist of Song-->
-        <LinearLayout
+        <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="300dp"
             android:backgroundTint="@color/lightText"
@@ -190,9 +195,9 @@
                 android:layout_margin="15dp"
                 android:gravity="left"
                 android:text="aaa"
+                android:scrollbars="vertical"
                 android:layout_height="wrap_content"/>
-
-        </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
 
     </LinearLayout>
 
