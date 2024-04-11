@@ -2,10 +2,19 @@ package com.example.spotify_cloneapp;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.Manifest;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -38,6 +47,10 @@ public class MainActivity extends AppCompatActivity {
     private SearchFragment searchFragment;
     private FavoriteFragment favoriteFragment;
     private static final int PERMISSION_REQUEST_CODE = 1001;
+    private RelativeLayout layoutPlayerBottom;
+    private ImageView imgSong, iconLove, iconPlay;
+    private TextView txtSongName, txtSongArtist;
+    AudioManager audioManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +83,55 @@ public class MainActivity extends AppCompatActivity {
 
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.FOREGROUND_SERVICE,
                         Manifest.permission.POST_NOTIFICATIONS}, PERMISSION_REQUEST_CODE);
+
+        audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        setupPlayerBottom();
+    }
+
+    private void setupPlayerBottom() {
+        layoutPlayerBottom = findViewById(R.id.layout_player_bottom);
+        imgSong = findViewById(R.id.imgSong);
+        iconLove = findViewById(R.id.iconLove);
+        iconPlay = findViewById(R.id.iconPlay);
+        txtSongName = findViewById(R.id.txtSongName);
+        txtSongArtist = findViewById(R.id.txtSongArtist);
+
+        iconPlay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (audioManager.isMusicActive()) {
+                    // Tạm ngừng phát nhạc
+                    audioManager.abandonAudioFocus(null);
+                    iconPlay.setImageResource(R.drawable.play_icon);
+                } else {
+                    // Tiếp tục phát nhạc
+                    audioManager.abandonAudioFocus(null);
+                    iconPlay.setImageResource(R.drawable.pause2_icon);
+                }
+            }
+        });
+
+        layoutPlayerBottom.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        updatePlayerVisibility();
+    }
+
+    private void updatePlayerVisibility() {
+        if (audioManager != null && audioManager.isMusicActive()) {
+            layoutPlayerBottom.setVisibility(View.VISIBLE);
+            iconPlay.setImageResource(R.drawable.pause2_icon);
+        } else {
+            layoutPlayerBottom.setVisibility(View.INVISIBLE);
+        }
     }
 
     @Override

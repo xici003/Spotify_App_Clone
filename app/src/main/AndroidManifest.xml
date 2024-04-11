@@ -30,7 +30,8 @@
             android:exported="false" />
         <activity
             android:name=".MainActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:launchMode="singleTop"/>
         <activity
             android:name=".logoBegin"
             android:exported="true">
@@ -40,6 +41,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <receiver android:name=".MusicControlReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="STOP_MUSIC" />
+            </intent-filter>
+        </receiver>
 
         <service android:name=".MusicService"
             android:foregroundServiceType="mediaPlayback"

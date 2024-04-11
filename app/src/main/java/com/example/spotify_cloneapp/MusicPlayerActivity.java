@@ -196,6 +196,7 @@ public class MusicPlayerActivity extends AppCompatActivity {
         song = queue.get(pos);
         loadData();
         getMusicPlayer();
+        createService(song);
     }
 
     private void prevSong() {
@@ -204,6 +205,7 @@ public class MusicPlayerActivity extends AppCompatActivity {
         song = queue.get(pos);
         loadData();
         getMusicPlayer();
+        createService(song);
     }
 
     protected void loadData() {
@@ -276,5 +278,4 @@ public class MusicPlayerActivity extends AppCompatActivity {
             return totalOut;
         }
     }
-
 }
