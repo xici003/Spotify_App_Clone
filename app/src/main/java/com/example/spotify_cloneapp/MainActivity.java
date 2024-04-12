@@ -24,10 +24,13 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.spotify_cloneapp.APIs.Service;
+import com.example.spotify_cloneapp.Database.PlayListDB;
+import com.example.spotify_cloneapp.Database.PlaylistSongDB;
 import com.example.spotify_cloneapp.Fragments.FavoriteFragment;
 import com.example.spotify_cloneapp.Fragments.HomeFragment;
 import com.example.spotify_cloneapp.Fragments.SearchFragment;
 import com.example.spotify_cloneapp.Models.Album;
+import com.example.spotify_cloneapp.Models.Playlist;
 import com.example.spotify_cloneapp.databinding.ActivityMainBinding;
 
 import java.util.ArrayList;
@@ -51,6 +54,8 @@ public class MainActivity extends AppCompatActivity {
     private ImageView imgSong, iconLove, iconPlay;
     private TextView txtSongName, txtSongArtist;
     AudioManager audioManager;
+    PlayListDB playlisttbl;
+    PlaylistSongDB playlistSongtbl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +91,33 @@ public class MainActivity extends AppCompatActivity {
 
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         setupPlayerBottom();
+        InitDB();
+    }
+
+    private void InitDB() {
+        playlisttbl = new PlayListDB(this,"playlist", null, 1);
+        playlistSongtbl = new PlaylistSongDB(this, "playlistSong", null, 1);
+
+        ArrayList<Playlist> playlists = playlisttbl.getAllPlaylist();
+        for (Playlist p: playlists){
+            System.out.println(p.getName());
+        }
+
+        //add playlist
+//        playlisttbl.addPlaylist(new Playlist(1, "My playlist1", "Nhạc nhẹ", ""));
+//        playlisttbl.addPlaylist(new Playlist(2, "My playlist2", "Nhạc nấu cơm", ""));
+//        playlisttbl.addPlaylist(new Playlist(3, "My playlist3", "Nhạc nghe vui", ""));
+
+//        playlistSongtbl.AddSongIntoPlaylist(8, 1);
+//        playlistSongtbl.AddSongIntoPlaylist(9, 1);
+//        playlistSongtbl.AddSongIntoPlaylist(11, 1);
+//        playlistSongtbl.AddSongIntoPlaylist(11, 2);
+//        playlistSongtbl.AddSongIntoPlaylist(15, 2);
+
+        ArrayList<Integer> index = playlistSongtbl.getAllSongInPlaylist(1);
+        for (int i : index){
+            System.out.println(i);
+        }
     }
 
     private void setupPlayerBottom() {
