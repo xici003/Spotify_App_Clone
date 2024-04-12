@@ -57,24 +57,21 @@ public class MusicPlayerActivity extends AppCompatActivity {
             handler.postDelayed(this, 1000);
         }
     };
-    private void fillQueue(int id){
-        if(queue==null){
-            Service.api.getSongsById(id).enqueue(new Callback<List<Song>>() {
-                @Override
-                public void onResponse(Call<List<Song>> call, Response<List<Song>> response) {
-                    if(response.body().size()>0) {
-                        queue = response.body();
-                        System.out.println(response.body().size());
-                        song=response.body().get(0);
-                    }
+    private void fillQueue(int idSong){
+        Service.api.getSongsById(idSong).enqueue(new Callback<List<Song>>() {
+            @Override
+            public void onResponse(Call<List<Song>> call, Response<List<Song>> response) {
+                if(response.body().size()>0) {
+                    song = response.body().get(position);
+                    queue = response.body();
                 }
+            }
 
-                @Override
-                public void onFailure(Call<List<Song>> call, Throwable t) {
-                    System.out.println("dfd");
-                }
-            });
-        }
+            @Override
+            public void onFailure(Call<List<Song>> call, Throwable t) {
+
+            }
+        });
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,18 +85,38 @@ public class MusicPlayerActivity extends AppCompatActivity {
             String albumName = intent.getStringExtra("albumName");
             this.albumName.setText(albumName);
             queue = getQueue(albumName);
-            fillQueue(idSong);
             if (!apiCalled) {
-                for (int i = 0; i < queue.size(); i++) {
-                    if (queue.get(i).getID_Song() == idSong) {
-                        song = queue.get(i);
-                        break;
-                    }
+                if(queue==null){
+                    Service.api.getSongsById(idSong).enqueue(new Callback<List<Song>>() {
+                        @Override
+                        public void onResponse(Call<List<Song>> call, Response<List<Song>> response) {
+                            if(response.body().size()>0) {
+                                song = response.body().get(position);
+                                queue = response.body();
+                                loadData();
+                                getMusicPlayer();
+                                createService(song);
+                                apiCalled = true;
+                            }
+                        }
+                        @Override
+                        public void onFailure(Call<List<Song>> call, Throwable t) {
+
+                        }
+                    });
                 }
-                loadData();
-                getMusicPlayer();
-                createService(song);
-                apiCalled = true;
+                else{
+                    for (int i = 0; i < queue.size(); i++) {
+                        if (queue.get(i).getID_Song() == idSong) {
+                            song = queue.get(i);
+                            break;
+                        }
+                    }
+                    loadData();
+                    getMusicPlayer();
+                    createService(song);
+                    apiCalled = true;
+                }
             }
 
             seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
