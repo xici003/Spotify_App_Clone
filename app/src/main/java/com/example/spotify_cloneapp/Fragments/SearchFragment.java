@@ -3,12 +3,29 @@ package com.example.spotify_cloneapp.Fragments;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.Toast;
 
+import com.example.spotify_cloneapp.APIs.Service;
+import com.example.spotify_cloneapp.Adapters.AlbumAdapter;
+import com.example.spotify_cloneapp.Adapters.SongAdapter;
+import com.example.spotify_cloneapp.Models.Album;
+import com.example.spotify_cloneapp.Models.Song;
 import com.example.spotify_cloneapp.R;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -21,7 +38,13 @@ public class SearchFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
-
+    private EditText searchEditText;
+    private RecyclerView searchSongRV;
+    private RecyclerView searchAlbumRV;
+    private SongAdapter songAdapter;
+    private AlbumAdapter albumAdapter;
+    private List<Song> songList;
+    private List<Album> albumList;
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
@@ -61,6 +84,75 @@ public class SearchFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_search, container, false);
+        View v= inflater.inflate(R.layout.fragment_search, container, false);
+        loadComponents(v);
+        return v;
+    }
+    private void loadComponents(View v){
+        searchEditText = v.findViewById(R.id.idEdtSearch);
+        searchSongRV = v.findViewById(R.id.idRVSongs);
+        searchAlbumRV = v.findViewById(R.id.idRVAblums);
+        songAdapter = new SongAdapter();
+        albumAdapter = new AlbumAdapter();
+
+
+        songList = songAdapter.getSongList();
+        albumList = albumAdapter.getAlbumList();
+
+        searchSongRV.setAdapter(songAdapter);
+        searchAlbumRV.setAdapter(albumAdapter);
+
+        searchEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                songAdapter.notifyDataSetChanged();
+                albumAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String searchText = searchEditText.getText().toString();
+                songList.clear();
+                albumList.clear();
+                if(!searchText.isEmpty()){
+                    System.out.println(searchText);
+
+                    Service.api.getSongByName(searchText).enqueue(new Callback<List<Song>>() {
+                        @Override
+                        public void onResponse(Call<List<Song>> call, Response<List<Song>> response) {
+                            if(response.body()!=null){
+                                System.out.println(response.body().size());
+                                songList.addAll(response.body());
+                                songAdapter.notifyDataSetChanged();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<List<Song>> call, Throwable t) {
+
+                        }
+                    });
+                    Service.api.getAlbumByName(searchText).enqueue(new Callback<List<Album>>() {
+                        @Override
+                        public void onResponse(Call<List<Album>> call, Response<List<Album>> response) {
+                            if(response.body()!=null){
+                                albumList.addAll(response.body());
+                                albumAdapter.notifyDataSetChanged();
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<List<Album>> call, Throwable t) {
+
+                        }
+                    });
+                }
+            }
+        });
     }
 }

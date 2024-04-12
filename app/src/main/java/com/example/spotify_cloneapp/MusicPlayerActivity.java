@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.spotify_cloneapp.APIs.Service;
 import com.example.spotify_cloneapp.Models.Song;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -23,6 +24,10 @@ import com.squareup.picasso.Picasso;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MusicPlayerActivity extends AppCompatActivity {
 
@@ -52,7 +57,26 @@ public class MusicPlayerActivity extends AppCompatActivity {
             handler.postDelayed(this, 1000);
         }
     };
+    private void fillQueue(int id){
+        if(queue==null){
+            Service.api.getSongsById(id).enqueue(new Callback<List<Song>>() {
+                @Override
+                public void onResponse(Call<List<Song>> call, Response<List<Song>> response) {
+                    if(response.body().size()>0) {
+                        queue = response.body();
+                        System.out.println(response.body().size());
+                        song=response.body().get(0);
+                    }
+                }
 
+                @Override
+                public void onFailure(Call<List<Song>> call, Throwable t) {
+                    System.out.println("dfd");
+                }
+            });
+        }
+    }
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_musicplayer_view);
@@ -64,7 +88,7 @@ public class MusicPlayerActivity extends AppCompatActivity {
             String albumName = intent.getStringExtra("albumName");
             this.albumName.setText(albumName);
             queue = getQueue(albumName);
-
+            fillQueue(idSong);
             if (!apiCalled) {
                 for (int i = 0; i < queue.size(); i++) {
                     if (queue.get(i).getID_Song() == idSong) {

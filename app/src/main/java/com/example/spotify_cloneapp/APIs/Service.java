@@ -33,7 +33,10 @@ public interface Service {
     Call<List<Song>> getSongsByAlbum(@Query("idAlbum") int idAlbum);
     @GET("Album.php")
     Call<List<Album>> getAlbumById(@Query("idAlbum") int idAlbum);
-
     @GET("Song.php")
     Call<List<Song>> getSongsById(@Query("idSong") int idSong);
+    @GET("Song.php")
+    Call<List<Song>> getSongByName(@Query("Name") String name);
+    @GET("Album.php")
+    Call<List<Album>> getAlbumByName(@Query("Name") String name);
 }
