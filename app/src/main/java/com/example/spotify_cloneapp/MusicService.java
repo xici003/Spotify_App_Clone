@@ -9,6 +9,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.widget.RemoteViews;
@@ -18,35 +19,67 @@ import androidx.core.app.NotificationCompat;
 
 import com.example.spotify_cloneapp.Models.Song;
 
+import java.io.IOException;
+
 public class MusicService extends Service {
-
     private MediaPlayer mediaPlayer;
-
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return binder;
     }
+    private final IBinder binder = new LocalBinder();
 
+    public class LocalBinder extends Binder {
+        MusicService getService() {
+            // Trả về instance của MusicService để clients có thể gọi các phương thức công cộng
+            return MusicService.this;
+        }
+    }
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Bundle bundle = intent.getExtras();
-        if(bundle != null){
-            Song song = (Song) bundle.getSerializable("song");
-            if(song != null){
-//                startMusic(song);
-                sendNotification(song);
+        if(intent != null) {
+            if("com.example.spotify_cloneapp.ACTION_PAUSE_MUSIC".equals(intent.getAction())){
+                pauseMusic();
+            } else if("com.example.spotify_cloneapp.ACTION_CONTINUE_MUSIC".equals(intent.getAction())){
+                continueMusic();
+            } else {
+                // Xử lý các Intent khác
+                Bundle bundle = intent.getExtras();
+                if(bundle != null){
+                    Song song = (Song) bundle.getSerializable("song");
+                    if(song != null){
+                        sendNotification(song);
+                    }
+                }
             }
         }
-
         return START_NOT_STICKY;
     }
+    protected MediaPlayer getMusicPlayer(Song song) {
+        Uri uri = null;
+        if (song != null) {
+            uri = Uri.parse(song.getURLmp3());
+        }
 
+        if (mediaPlayer != null) {
+            mediaPlayer.stop();
+            mediaPlayer.release();
+        }
+        mediaPlayer = new MediaPlayer();
+        try {
+            mediaPlayer.setDataSource(getApplicationContext(), uri);
+            mediaPlayer.prepareAsync();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }finally {
+            return mediaPlayer;
+        }
+    }
     private void startMusic(Song song) {
         if(mediaPlayer == null){
             mediaPlayer = MediaPlayer.create(getApplicationContext(),
                     Uri.parse(song.getURLmp3()));
         }
-
         mediaPlayer.start();
     }
 
@@ -55,14 +88,11 @@ public class MusicService extends Service {
         Intent intent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,
                 PendingIntent.FLAG_IMMUTABLE);
-
         RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.layout_custom_notification);
         remoteViews.setTextViewText(R.id.tv_name_song_notification, song.getNameSong());
         remoteViews.setTextViewText(R.id.tv_name_artist_notification, song.getNameArtist());
-
         remoteViews.setImageViewUri(R.id.img_notification, Uri.parse(song.getThumbnail()));
         remoteViews.setImageViewResource(R.id.img_play_or_pause_notification, R.drawable.pause_icon);
-
         Notification noti = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(R.drawable.logo1)
                 .setContentText("Spotify")
@@ -71,8 +101,24 @@ public class MusicService extends Service {
                 .setCustomContentView(remoteViews)
                 .setSound(null)
                 .build();
-
         startForeground(1, noti);
+    }
+    public void pauseMusic() {
+        if(mediaPlayer != null && mediaPlayer.isPlaying()){
+            mediaPlayer.pause();
+        }
+    }
+    public void continueMusic() {
+        if(mediaPlayer != null && !mediaPlayer.isPlaying()){
+            mediaPlayer.start(); // Tiếp tục phát nhạc từ điểm đã tạm ngừng
+        }
+    }
+    public void stopMusic() {
+        if(mediaPlayer != null && mediaPlayer.isPlaying()){
+            mediaPlayer.stop();
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
     }
 
     @Override
