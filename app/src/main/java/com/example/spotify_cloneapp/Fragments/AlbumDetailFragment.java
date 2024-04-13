@@ -136,7 +136,7 @@ public class AlbumDetailFragment extends Fragment {
                 Intent intent=new Intent(getContext(), MusicPlayerActivity.class);
                 intent.putExtra("idSong",songsOfAlbumAdapter.getSongList().get(0).getID_Song());
                 intent.putExtra("albumName",album.getName());
-                startActivityForResult(intent,118);
+                getActivity().startActivityForResult(intent,103);
             }
         });
     }

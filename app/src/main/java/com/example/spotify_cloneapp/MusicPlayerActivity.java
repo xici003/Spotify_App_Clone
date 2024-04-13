@@ -123,7 +123,9 @@ public class MusicPlayerActivity extends AppCompatActivity {
                         @Override
                         public void onResponse(Call<List<Song>> call, Response<List<Song>> response) {
                             if(response.body().size()>0) {
-                                song = response.body().get(position);
+                                if(song==null){
+                                    song = response.body().get(position);
+                                }
                                 loadData();
                                 getMusicPlayer(isContinue);
                                 createService(song);
