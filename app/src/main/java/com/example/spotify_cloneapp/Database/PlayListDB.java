@@ -28,7 +28,7 @@ public class PlayListDB extends SQLiteOpenHelper {
                 + Id + " Integer primary key autoincrement, "
                 + Name + " Text, "
                 + Description + " Text, "
-                + Thumbnail + " Text NULL)";
+                + Thumbnail + " Text)";
 
         db.execSQL(sqlCreate);
     }

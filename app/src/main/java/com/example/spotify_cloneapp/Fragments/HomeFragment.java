@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 
 import com.example.spotify_cloneapp.APIs.Service;
 import com.example.spotify_cloneapp.Adapters.AlbumAdapter;
+import com.example.spotify_cloneapp.MainActivity;
 import com.example.spotify_cloneapp.Models.Album;
 import com.example.spotify_cloneapp.R;
 
@@ -94,6 +95,10 @@ public class HomeFragment extends Fragment {
         recommendedAlbumAdapter= new AlbumAdapter();
         popularAlbumAdapter=new AlbumAdapter();
         trendingAlbumAdapter=new AlbumAdapter();
+
+        recommendedAlbumAdapter.setContext((MainActivity)getActivity());
+        popularAlbumAdapter.setContext((MainActivity)getActivity());
+        trendingAlbumAdapter.setContext((MainActivity)getActivity());
 
         recommendedAlbumRView.setAdapter(recommendedAlbumAdapter);
         popularAlbumRView.setAdapter(popularAlbumAdapter);

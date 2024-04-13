@@ -1,5 +1,6 @@
 package com.example.spotify_cloneapp.Adapters;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +20,7 @@ import java.util.List;
 public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder> {
 
     private List<Song> songList;
+    private Activity context;
     private String albumName;
 
     public SongAdapter() {
@@ -27,7 +29,9 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
     public void setSongList(List<Song> songList) {
         this.songList.addAll(songList);
     }
-
+    public void setContext(Activity context) {
+        this.context = context;
+    }
     public List<Song> getSongList() {
         return songList;
     }
@@ -55,7 +59,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
                 Intent intent = new Intent(v.getContext(), MusicPlayerActivity.class);
                 intent.putExtra("idSong",song.getID_Song());
                 intent.putExtra("albumName", albumName);
-                v.getContext().startActivity(intent);
+                context.startActivityForResult(intent,103);
             }
         });
     }
