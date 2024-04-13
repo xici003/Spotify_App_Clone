@@ -17,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
@@ -26,12 +27,15 @@ import androidx.fragment.app.FragmentTransaction;
 import com.example.spotify_cloneapp.APIs.Service;
 import com.example.spotify_cloneapp.Database.PlayListDB;
 import com.example.spotify_cloneapp.Database.PlaylistSongDB;
+import com.example.spotify_cloneapp.Fragments.AlbumDetailFragment;
 import com.example.spotify_cloneapp.Fragments.FavoriteFragment;
 import com.example.spotify_cloneapp.Fragments.HomeFragment;
 import com.example.spotify_cloneapp.Fragments.SearchFragment;
 import com.example.spotify_cloneapp.Models.Album;
 import com.example.spotify_cloneapp.Models.Playlist;
+import com.example.spotify_cloneapp.Models.Song;
 import com.example.spotify_cloneapp.databinding.ActivityMainBinding;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
