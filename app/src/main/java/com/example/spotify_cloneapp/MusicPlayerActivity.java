@@ -44,12 +44,24 @@ public class MusicPlayerActivity extends AppCompatActivity {
     private Handler handler = new Handler();
     private Thread playThread;
     private ImageView imgBack;
-
+    private boolean isContinue = false;
     private boolean apiCalled = false;
-
     private MusicService musicService;
-    private boolean isServiceBound = false;
-    private ServiceConnection serviceConnection;
+    private boolean isServiceBound;
+
+    private ServiceConnection serviceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            MusicService.LocalBinder binder = (MusicService.LocalBinder) service;
+            musicService = binder.getService();
+            isServiceBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            isServiceBound = false;
+        }
+    };
 
     @Override
     protected void onStart() {
@@ -57,6 +69,16 @@ public class MusicPlayerActivity extends AppCompatActivity {
         Intent intent = new Intent(this, MusicService.class);
         bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (isServiceBound) {
+            unbindService(serviceConnection);
+            isServiceBound = false;
+        }
+    }
+
 
     private List<Song> queue;
     private Runnable updateSeekBar = new Runnable() {
@@ -81,12 +103,11 @@ public class MusicPlayerActivity extends AppCompatActivity {
             public void onServiceConnected(ComponentName name, IBinder service) {
                 MusicService.LocalBinder binder=(MusicService.LocalBinder) service;
                 musicService=binder.getService();
-                isServiceBound=true;
             }
 
             @Override
             public void onServiceDisconnected(ComponentName name) {
-                isServiceBound=false;
+
             }
         };
 
@@ -94,6 +115,7 @@ public class MusicPlayerActivity extends AppCompatActivity {
         if (intent != null) {
             int idSong = intent.getIntExtra("idSong", position);
             String albumName = intent.getStringExtra("albumName");
+            isContinue=intent.getBooleanExtra("isContinue",false);
             this.albumName.setText(albumName);
             queue = getQueue(albumName);
             if (!apiCalled) {
@@ -103,7 +125,7 @@ public class MusicPlayerActivity extends AppCompatActivity {
                             if(response.body().size()>0) {
                                 song = response.body().get(position);
                                 loadData();
-                                getMusicPlayer();
+                                getMusicPlayer(isContinue);
                                 createService(song);
                                 apiCalled = true;
                             }
@@ -262,7 +284,7 @@ public class MusicPlayerActivity extends AppCompatActivity {
         pos %= queue.size();
         song = queue.get(pos);
         loadData();
-        getMusicPlayer();
+        getMusicPlayer(false);
         createService(song);
     }
 
@@ -271,7 +293,7 @@ public class MusicPlayerActivity extends AppCompatActivity {
         pos = pos == -1 ? queue.size() - 1 : pos % queue.size();
         song = queue.get(pos);
         loadData();
-        getMusicPlayer();
+        getMusicPlayer(false);
         createService(song);
     }
 
@@ -285,21 +307,35 @@ public class MusicPlayerActivity extends AppCompatActivity {
         lyrics.invalidate();
     }
 
-    protected void getMusicPlayer() {
+    protected void getMusicPlayer(boolean isContinue) {
+        if(isContinue){
+            mediaPlayer = musicService.getMusicPlayer();
+            mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mp) {
+                    seekBar.setMax(mediaPlayer.getDuration() / 1000);
+                    MusicPlayerActivity.this.runOnUiThread(updateSeekBar);
+                    handler.postDelayed(updateSeekBar, 0);
+                }
+            });
+        }
+        else {
             mediaPlayer = musicService.getMusicPlayer(song);
             mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mp) {
-                    if(!mediaPlayer.isPlaying()){
-                        mediaPlayer.start();
-                    }
-                    // Cập nhật UI thông qua BroadcastReceiver hoặc EventBus
+                    mediaPlayer.start();
                     seekBar.setMax(mediaPlayer.getDuration() / 1000);
                     MusicPlayerActivity.this.runOnUiThread(updateSeekBar);
                     handler.postDelayed(updateSeekBar, 0); // Start updating the SeekBar
                 }
             });
-            durationTotal.setText(song.getDuration());
+
+
+        }
+        durationTotal.setText(song.getDuration());
+        MusicPlayerActivity.this.runOnUiThread(updateSeekBar);
+
     }
 
     private String formattedTime(int mCurrentPosition) {
