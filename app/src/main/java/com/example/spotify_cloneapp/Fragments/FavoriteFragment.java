@@ -3,12 +3,21 @@ package com.example.spotify_cloneapp.Fragments;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import com.example.spotify_cloneapp.Adapters.PlaylistAdapter;
+import com.example.spotify_cloneapp.Database.PlayListDB;
+import com.example.spotify_cloneapp.Database.PlaylistSongDB;
+import com.example.spotify_cloneapp.Models.Playlist;
 import com.example.spotify_cloneapp.R;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -25,6 +34,11 @@ public class FavoriteFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    private RecyclerView idRVPlaylist;
+    private PlaylistAdapter playlistAdapter;
+    private PlayListDB playlisttbl;
+    private PlaylistSongDB playlistSongtbl;
+    private List<Playlist> playlists = new ArrayList<>();
 
     public FavoriteFragment() {
         // Required empty public constructor
@@ -61,6 +75,28 @@ public class FavoriteFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_favorite, container, false);
+        View view = inflater.inflate(R.layout.fragment_favorite, container, false);;
+        this.loadComponent(view);
+        return view;
+    }
+
+    private void loadComponent(View view) {
+        idRVPlaylist = view.findViewById(R.id.idRVPlaylist);
+        playlisttbl = new PlayListDB(this.getContext(),"playlist", null, 1);
+        playlistSongtbl = new PlaylistSongDB(this.getContext(), "playlistSong", null, 1);
+
+        // Khởi tạo playlistAdapter
+        playlistAdapter = new PlaylistAdapter();
+
+        // Lấy dữ liệu từ cơ sở dữ liệu
+        playlists = playlisttbl.getAllPlaylist();
+
+        // Đặt dữ liệu vào adapter và gán vào RecyclerView
+        playlistAdapter.setPlaylists(playlists);
+        idRVPlaylist.setAdapter(playlistAdapter);
+
+        // Cập nhật giao diện
+        playlistAdapter.notifyDataSetChanged();
+        Toast.makeText(view.getContext(), "" + playlists.size(), Toast.LENGTH_SHORT).show();
     }
 }

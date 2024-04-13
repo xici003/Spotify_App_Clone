@@ -54,8 +54,8 @@ public class MainActivity extends AppCompatActivity {
     private ImageView imgSong, iconLove, iconPlay;
     private TextView txtSongName, txtSongArtist;
     AudioManager audioManager;
-    PlayListDB playlisttbl;
-    PlaylistSongDB playlistSongtbl;
+    public PlayListDB playlisttbl;
+    public PlaylistSongDB playlistSongtbl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,11 +98,6 @@ public class MainActivity extends AppCompatActivity {
         playlisttbl = new PlayListDB(this,"playlist", null, 1);
         playlistSongtbl = new PlaylistSongDB(this, "playlistSong", null, 1);
 
-        ArrayList<Playlist> playlists = playlisttbl.getAllPlaylist();
-        for (Playlist p: playlists){
-            System.out.println(p.getName());
-        }
-
         //add playlist
 //        playlisttbl.addPlaylist(new Playlist(1, "My playlist1", "Nhạc nhẹ", ""));
 //        playlisttbl.addPlaylist(new Playlist(2, "My playlist2", "Nhạc nấu cơm", ""));
@@ -114,6 +109,10 @@ public class MainActivity extends AppCompatActivity {
 //        playlistSongtbl.AddSongIntoPlaylist(11, 2);
 //        playlistSongtbl.AddSongIntoPlaylist(15, 2);
 
+        ArrayList<Playlist> playlists = playlisttbl.getAllPlaylist();
+        for (Playlist p: playlists){
+            System.out.println(p.getName());
+        }
         ArrayList<Integer> index = playlistSongtbl.getAllSongInPlaylist(1);
         for (int i : index){
             System.out.println(i);

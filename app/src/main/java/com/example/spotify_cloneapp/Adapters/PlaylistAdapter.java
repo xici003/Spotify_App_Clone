@@ -25,12 +25,12 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Playli
     private List<Playlist> playlists;
     private String namePlaylist;
     private Context mContext;
-    public PlaylistAdapter(Context mContext) {
+    public PlaylistAdapter() {
         this.playlists = new ArrayList<>();
-        this.mContext = mContext;
     }
     public void setPlaylists(List<Playlist> playlists) {
         this.playlists.addAll(playlists);
+        notifyDataSetChanged();
     }
 
     public List<Playlist> getPlaylists() {
@@ -50,8 +50,11 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Playli
         // Đặt hình ảnh và các sự kiện khác ở đây
         holder.namePlaylist.setText(playlist.getName());
         holder.description.setText(playlist.getDescription());
-        if (playlists.get(position).getThumbnail() != null) {
+        try{
             Picasso.get().load(playlist.getThumbnail()).placeholder(R.drawable.hinhnen).into(holder.thumbnail);
+        }
+        catch (Exception e){
+            holder.thumbnail.setImageResource(R.drawable.hinhnen);
         }
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -64,7 +67,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Playli
 
     @Override
     public int getItemCount() {
-        return 0;
+        return playlists.size();
     }
 
     public class PlaylistViewHolder extends RecyclerView.ViewHolder {
