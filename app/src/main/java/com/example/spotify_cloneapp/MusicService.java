@@ -2,6 +2,8 @@ package com.example.spotify_cloneapp;
 
 import static com.example.spotify_cloneapp.MyApplication.CHANNEL_ID;
 
+import static org.chromium.base.ThreadUtils.runOnUiThread;
+
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -12,11 +14,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.widget.ImageView;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
@@ -26,10 +31,18 @@ import androidx.core.app.NotificationManagerCompat;
 
 import com.example.spotify_cloneapp.Models.Song;
 
+import org.chromium.base.task.AsyncTask;
+
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class MusicService extends Service {
     private MediaPlayer mediaPlayer;
+    private ImageView btnPauseOrPlay;
+    private RemoteViews remoteViews;
+    private Notification noti;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -66,22 +79,35 @@ public class MusicService extends Service {
         return START_NOT_STICKY;
     }
 
-    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+    private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            changeBtnPause(intent);
+            if ("com.example.spotify_cloneapp.ACTION_PAUSE_MUSIC".equals(intent.getAction())) {
+                if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+                    pauseMusic();
+                } else {
+                    continueMusic();
+                }
+            } else if ("com.example.spotify_cloneapp.ACTION_PREVIOUS".equals(intent.getAction())) {
+                // Xử lý hành động pre ở đây
+                playPreviousSong();
+            } else if ("com.example.spotify_cloneapp.ACTION_NEXT".equals(intent.getAction())) {
+                // Xử lý hành động next ở đây
+                playNextSong();
+            }
+            updateNotificationIcon();
         }
     };
 
-    private void changeBtnPause(Intent intent) {
-        if ("com.example.spotify_cloneapp.ACTION_PAUSE_MUSIC".equals(intent.getAction())) {
-            if (mediaPlayer != null && mediaPlayer.isPlaying()) {
-                pauseMusic();
-            } else {
-                continueMusic();
-            }
-        }
+    private void updateNotificationIcon() {
+        int playPauseIcon = mediaPlayer.isPlaying() ? R.drawable.pause_icon : R.drawable.play2_icon;
+        // Cập nhật icon trong RemoteViews
+        remoteViews.setImageViewResource(R.id.img_play_or_pause_notification, playPauseIcon);
+        // Cập nhật thông báo
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(1, noti);
     }
+
     protected MediaPlayer getMusicPlayer(){
         return mediaPlayer;
     }
@@ -119,34 +145,38 @@ public class MusicService extends Service {
         }
         mediaPlayer.start();
     }
-
     private void sendNotification(Song song) {
-        Toast.makeText(this, "Có Noti", Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(this, MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent,
-                PendingIntent.FLAG_IMMUTABLE);
-        RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.layout_custom_notification);
+        Intent intent = new Intent(this, MusicPlayerActivity.class);
+        intent.putExtra("song", song); // Đưa dữ liệu về bài hát hiện tại vào Intent
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
+                intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        remoteViews = new RemoteViews(getPackageName(), R.layout.layout_custom_notification);
+
+        int playPauseIcon = mediaPlayer.isPlaying() ? R.drawable.pause_icon : R.drawable.play2_icon;
+        remoteViews.setImageViewResource(R.id.img_play_or_pause_notification, playPauseIcon);
         remoteViews.setTextViewText(R.id.tv_name_song_notification, song.getNameSong());
         remoteViews.setTextViewText(R.id.tv_name_artist_notification, song.getNameArtist());
         remoteViews.setImageViewUri(R.id.img_notification, Uri.parse(song.getThumbnail()));
-        remoteViews.setImageViewResource(R.id.img_play_or_pause_notification, R.drawable.pause_icon);
-
 
         Intent pauseIntent = new Intent("com.example.spotify_cloneapp.ACTION_PAUSE_MUSIC");
-        PendingIntent pausePendingIntent = PendingIntent.getBroadcast(this, 0, pauseIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pausePendingIntent = PendingIntent.getBroadcast(this, 0,
+                pauseIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         remoteViews.setOnClickPendingIntent(R.id.img_play_or_pause_notification, pausePendingIntent);
 
-
-        Notification noti = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setSmallIcon(R.drawable.logo1)
+        noti = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setSmallIcon(R.drawable.spotify)
                 .setContentText("Spotify")
                 .setContentTitle("Notification")
-                .setContentIntent(pendingIntent)
+                .setContentIntent(pendingIntent) // Thiết lập PendingIntent là mục tiêu khi ấn vào thông báo
                 .setCustomContentView(remoteViews)
                 .setSound(null)
                 .build();
+
         startForeground(1, noti);
     }
+
     public void pauseMusic() {
         if(mediaPlayer != null && mediaPlayer.isPlaying()){
             mediaPlayer.pause();
@@ -154,7 +184,7 @@ public class MusicService extends Service {
     }
     public void continueMusic() {
         if(mediaPlayer != null && !mediaPlayer.isPlaying()){
-            mediaPlayer.start(); // Tiếp tục phát nhạc từ điểm đã tạm ngừng
+            mediaPlayer.start();
         }
     }
     public void stopMusic() {
@@ -163,6 +193,14 @@ public class MusicService extends Service {
             mediaPlayer.release();
             mediaPlayer = null;
         }
+    }
+
+    private void playPreviousSong() {
+        // Đưa ra logic để chuyển đến bài hát trước đó và bắt đầu phát nhạc
+    }
+
+    private void playNextSong() {
+        // Đưa ra logic để chuyển đến bài hát tiếp theo và bắt đầu phát nhạc
     }
 
     @Override

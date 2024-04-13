@@ -155,12 +155,12 @@ public class MainActivity extends AppCompatActivity {
         layoutPlayerBottom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                    // MusicService không phát nhạc, khởi động MusicPlayerActivity
-                    Intent intent = new Intent(v.getContext(), MusicPlayerActivity.class);
-                    intent.putExtra("idSong",currentSong.getID_Song());
-                    intent.putExtra("albumName", albumName);
-                    intent.putExtra("isContinue",true);
-                    startActivityForResult(intent,103);
+                // MusicService không phát nhạc, khởi động MusicPlayerActivity
+                Intent intent = new Intent(v.getContext(), MusicPlayerActivity.class);
+                intent.putExtra("idSong",currentSong.getID_Song());
+                intent.putExtra("albumName", albumName);
+                intent.putExtra("isContinue",true);
+                startActivityForResult(intent,103);
             }
         });
     }

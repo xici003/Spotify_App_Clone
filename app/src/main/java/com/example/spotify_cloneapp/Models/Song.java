@@ -73,4 +73,60 @@ public class Song implements Serializable {
     public String getNameArtist() {
         return nameArtist;
     }
+
+    public void setID_Song(int ID_Song) {
+        this.ID_Song = ID_Song;
+    }
+
+    public void setThumbnail(String thumbnail) {
+        Thumbnail = thumbnail;
+    }
+
+    public void setURLmp3(String URLmp3) {
+        this.URLmp3 = URLmp3;
+    }
+
+    public void setNameSong(String nameSong) {
+        this.nameSong = nameSong;
+    }
+
+    public void setDuration(String duration) {
+        Duration = duration;
+    }
+
+    public void setCategory(String category) {
+        Category = category;
+    }
+
+    public void setTotalPlayTime(int totalPlayTime) {
+        TotalPlayTime = totalPlayTime;
+    }
+
+    public void setLike(int like) {
+        Like = like;
+    }
+
+    public void setDisliked(int disliked) {
+        Disliked = disliked;
+    }
+
+    public void setViewCount(int viewCount) {
+        ViewCount = viewCount;
+    }
+
+    public void setDescription(String description) {
+        Description = description;
+    }
+
+    public void setLyrics(String lyrics) {
+        Lyrics = lyrics;
+    }
+
+    public void setNameAuthor(String nameAuthor) {
+        this.nameAuthor = nameAuthor;
+    }
+
+    public void setNameArtist(String nameArtist) {
+        this.nameArtist = nameArtist;
+    }
 }
