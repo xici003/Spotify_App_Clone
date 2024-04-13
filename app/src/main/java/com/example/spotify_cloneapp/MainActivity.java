@@ -17,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
@@ -26,12 +27,15 @@ import androidx.fragment.app.FragmentTransaction;
 import com.example.spotify_cloneapp.APIs.Service;
 import com.example.spotify_cloneapp.Database.PlayListDB;
 import com.example.spotify_cloneapp.Database.PlaylistSongDB;
+import com.example.spotify_cloneapp.Fragments.AlbumDetailFragment;
 import com.example.spotify_cloneapp.Fragments.FavoriteFragment;
 import com.example.spotify_cloneapp.Fragments.HomeFragment;
 import com.example.spotify_cloneapp.Fragments.SearchFragment;
 import com.example.spotify_cloneapp.Models.Album;
 import com.example.spotify_cloneapp.Models.Playlist;
+import com.example.spotify_cloneapp.Models.Song;
 import com.example.spotify_cloneapp.databinding.ActivityMainBinding;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,13 +53,16 @@ public class MainActivity extends AppCompatActivity {
     private HomeFragment homeFragment;
     private SearchFragment searchFragment;
     private FavoriteFragment favoriteFragment;
+    private AlbumDetailFragment albumDetailFragment;
     private static final int PERMISSION_REQUEST_CODE = 1001;
     private RelativeLayout layoutPlayerBottom;
     private ImageView imgSong, iconLove, iconPlay;
     private TextView txtSongName, txtSongArtist;
     AudioManager audioManager;
-    public PlayListDB playlisttbl;
-    public PlaylistSongDB playlistSongtbl;
+    PlayListDB playlisttbl;
+    PlaylistSongDB playlistSongtbl;
+    private Song currentSong;
+    private String albumName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,11 +139,14 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if (audioManager.isMusicActive()) {
                     // Tạm ngừng phát nhạc
-                    audioManager.abandonAudioFocus(null);
+                    Intent pauseIntent = new Intent(getApplicationContext(), MusicService.class);
+                    pauseIntent.setAction("com.example.spotify_cloneapp.ACTION_PAUSE_MUSIC");
+                    startService(pauseIntent);
                     iconPlay.setImageResource(R.drawable.play_icon);
                 } else {
-                    // Tiếp tục phát nhạc
-                    audioManager.abandonAudioFocus(null);
+                    Intent continueIntent = new Intent(getApplicationContext(), MusicService.class);
+                    continueIntent.setAction("com.example.spotify_cloneapp.ACTION_CONTINUE_MUSIC");
+                    startService(continueIntent);
                     iconPlay.setImageResource(R.drawable.pause2_icon);
                 }
             }
@@ -145,7 +155,12 @@ public class MainActivity extends AppCompatActivity {
         layoutPlayerBottom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                    // MusicService không phát nhạc, khởi động MusicPlayerActivity
+                    Intent intent = new Intent(v.getContext(), MusicPlayerActivity.class);
+                    intent.putExtra("idSong",currentSong.getID_Song());
+                    intent.putExtra("albumName", albumName);
+                    intent.putExtra("isContinue",true);
+                    startActivityForResult(intent,103);
             }
         });
     }
@@ -205,5 +220,30 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         Intent intent = new Intent(this, MusicService.class);
         stopService(intent);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode==118 && requestCode==103){
+            Bundle bundle= data.getExtras();
+            if(bundle!=null) {
+                currentSong= (Song) bundle.getSerializable("curSong");
+                if(currentSong!=null){
+                    txtSongName.setText(currentSong.getNameSong());
+                    txtSongArtist.setText(currentSong.getNameArtist());
+                    Picasso.get().load(currentSong.getThumbnail()).into(imgSong);
+
+                }
+                albumName= data.getStringExtra("albumName");
+            }
+        }
+    }
+    public void callAlbumDetailFragment(int idAlbum){
+        albumDetailFragment=new AlbumDetailFragment();
+        Bundle bundle=new Bundle();
+        bundle.putInt("idAlbum",idAlbum);
+        albumDetailFragment.setArguments(bundle);
+        replaceFragment(albumDetailFragment);
     }
 }
