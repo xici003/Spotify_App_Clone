@@ -1,13 +1,18 @@
 package com.example.spotify_cloneapp.Fragments;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.example.spotify_cloneapp.Adapters.PlaylistAdapter;
@@ -38,7 +43,8 @@ public class FavoriteFragment extends Fragment {
     private PlaylistAdapter playlistAdapter;
     private PlayListDB playlisttbl;
     private PlaylistSongDB playlistSongtbl;
-    private List<Playlist> playlists = new ArrayList<>();
+    private ArrayList<Playlist> playlists = new ArrayList<>();
+    private LinearLayout btnAddPlaylist;
 
     public FavoriteFragment() {
         // Required empty public constructor
@@ -82,21 +88,71 @@ public class FavoriteFragment extends Fragment {
 
     private void loadComponent(View view) {
         idRVPlaylist = view.findViewById(R.id.idRVPlaylist);
+        btnAddPlaylist = view.findViewById(R.id.btnAddPlaylist);
         playlisttbl = new PlayListDB(this.getContext(),"playlist", null, 1);
         playlistSongtbl = new PlaylistSongDB(this.getContext(), "playlistSong", null, 1);
 
         // Khởi tạo playlistAdapter
-        playlistAdapter = new PlaylistAdapter();
-
-        // Lấy dữ liệu từ cơ sở dữ liệu
-        playlists = playlisttbl.getAllPlaylist();
-
-        // Đặt dữ liệu vào adapter và gán vào RecyclerView
-        playlistAdapter.setPlaylists(playlists);
+        playlistAdapter = new PlaylistAdapter(view.getContext(), playlists);
         idRVPlaylist.setAdapter(playlistAdapter);
 
-        // Cập nhật giao diện
+        LoadRV();
+        btnAddPlaylist.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AddPlaylist();
+            }
+        });
+    }
+
+    private void LoadRV() {
+        playlists.clear();
+        System.out.println(playlists.size());
+        playlists.addAll(playlisttbl.getAllPlaylist());
+        System.out.println(playlists.size());
         playlistAdapter.notifyDataSetChanged();
-        Toast.makeText(view.getContext(), "" + playlists.size(), Toast.LENGTH_SHORT).show();
+    }
+
+    private void AddPlaylist() {
+        // Tạo LayoutInflater và View mới để chứa các EditText
+        LayoutInflater inflater = LayoutInflater.from(getContext());
+        View dialogView = inflater.inflate(R.layout.dialog_add_playlist, null);
+
+        // Tìm các EditText trong dialogView
+        final EditText etName = dialogView.findViewById(R.id.etName);
+        final EditText etDescription = dialogView.findViewById(R.id.etDescription);
+
+        // Tạo AlertDialog.Builder và thiết lập các thuộc tính cần thiết cho dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Add Playlist");
+        builder.setView(dialogView); // Sử dụng dialogView đã tạo
+
+        builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Lấy dữ liệu từ các trường nhập liệu
+                String name = etName.getText().toString();
+                String description = etDescription.getText().toString();
+
+                // Thêm playlist mới vào cơ sở dữ liệu (giả định đã có phương thức addPlaylist)
+                String sql = "insert into playlist('namePlaylist', 'description') " +
+                        "values ('" + name + "', '" + description + "')";
+//                System.out.println(sql);
+                playlisttbl.RunSQL(sql);
+                LoadRV();
+            }
+        });
+
+        // Xử lý sự kiện khi người dùng nhấn nút "Hủy"
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        // Hiển thị AlertDialog
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 }
