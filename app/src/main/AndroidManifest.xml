@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <application
         android:name=".MyApplication"
@@ -20,6 +21,12 @@
         android:theme="@style/Theme.Spotify_cloneApp"
         tools:targetApi="31">
         <activity
+            android:name=".UpDatePlaylist"
+            android:exported="false" />
+        <activity
+            android:name=".Favorite"
+            android:exported="false" />
+        <activity
             android:name=".Fragments.SearchFragment"
             android:exported="false" />
         <activity
@@ -31,7 +38,7 @@
         <activity
             android:name=".MainActivity"
             android:exported="false"
-            android:launchMode="singleTop"/>
+            android:launchMode="singleTop" />
         <activity
             android:name=".logoBegin"
             android:exported="true">
@@ -41,14 +48,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <receiver android:name=".MusicControlReceiver"
+
+        <receiver
+            android:name=".MusicControlReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="STOP_MUSIC" />
             </intent-filter>
         </receiver>
 
-        <service android:name=".MusicService"
+        <service
+            android:name=".MusicService"
             android:foregroundServiceType="mediaPlayback"
             tools:ignore="ForegroundServicePermission" />
     </application>

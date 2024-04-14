@@ -96,5 +96,29 @@ public class PlayListDB extends SQLiteOpenHelper {
     public void RunSQL(String sql){
         SQLiteDatabase db = getWritableDatabase();
         db.execSQL(sql);
+    }    public void addSampleData() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(Id, "1");
+        values.put(Name, "playlist chill");
+        values.put(Description, "vu vơ");
+        values.put(Thumbnail, "https://i.pinimg.com/originals/9e/2c/19/9e2c199ae5136a42e56d5ae417109353.jpg");
+        db.insert(TableName, null, values);
+        values.clear();
+
+        values.put(Id, "2");
+        values.put(Name, "cahoihoang");
+        values.put(Description, "khong co gi ca");
+        values.put(Thumbnail, "https://i.pinimg.com/originals/74/11/13/7411134a17df554cd7c20cdb9781e177.jpg");
+        db.insert(TableName, null, values);
+        values.clear();
+
+        values.put(Id, "3");
+        values.put(Name, "cahoihoang");
+        values.put(Description, "khong co gi ca");
+        values.put(Thumbnail, "https://i.pinimg.com/originals/00/f9/ec/00f9ec978a6910a1347544233954a9d2.jpg");
+        db.insert(TableName, null, values);
+        db.close();
     }
 }

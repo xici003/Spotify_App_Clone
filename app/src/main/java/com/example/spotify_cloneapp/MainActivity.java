@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.FOREGROUND_SERVICE,
-                        Manifest.permission.POST_NOTIFICATIONS}, PERMISSION_REQUEST_CODE);
+                Manifest.permission.POST_NOTIFICATIONS}, PERMISSION_REQUEST_CODE);
 
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         setupPlayerBottom();
@@ -145,6 +145,8 @@ public class MainActivity extends AppCompatActivity {
         layoutPlayerBottom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+
 
             }
         });
