@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.spotify_cloneapp.APIs.Service;
 import com.example.spotify_cloneapp.Adapters.SongAdapter;
@@ -163,11 +164,16 @@ public class AlbumDetailFragment extends Fragment {
 
     }
     private void saveQueueofSongs(List<Song> list){
-        SharedPreferences prefs= getActivity().getSharedPreferences(album.getName(), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor=prefs.edit();
-        Gson gson=new Gson();
-        String json=gson.toJson(list);
-        editor.putString(album.getName(),json);
-        editor.apply();
+        if (getActivity() != null && album != null) {
+            SharedPreferences prefs = getActivity().getSharedPreferences(album.getName(), Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = prefs.edit();
+            Gson gson = new Gson();
+            String json = gson.toJson(list);
+            editor.putString(album.getName(), json);
+            editor.apply();
+        } else {
+            Toast.makeText(getActivity(), "Album null", Toast.LENGTH_SHORT).show();
+        }
     }
+
 }

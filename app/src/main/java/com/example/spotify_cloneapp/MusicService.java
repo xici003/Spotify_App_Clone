@@ -116,6 +116,8 @@ public class MusicService extends Service {
         super.onCreate();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("com.example.spotify_cloneapp.ACTION_PAUSE_MUSIC");
+        intentFilter.addAction("com.example.spotify_cloneapp.ACTION_PREVIOUS");
+        intentFilter.addAction("com.example.spotify_cloneapp.ACTION_NEXT");
         registerReceiver(broadcastReceiver, intentFilter);
     }
     protected MediaPlayer getMusicPlayer(Song song) {
@@ -154,16 +156,28 @@ public class MusicService extends Service {
 
         remoteViews = new RemoteViews(getPackageName(), R.layout.layout_custom_notification);
 
-        int playPauseIcon = mediaPlayer.isPlaying() ? R.drawable.pause_icon : R.drawable.play2_icon;
+        int playPauseIcon = R.drawable.pause_icon;
         remoteViews.setImageViewResource(R.id.img_play_or_pause_notification, playPauseIcon);
         remoteViews.setTextViewText(R.id.tv_name_song_notification, song.getNameSong());
         remoteViews.setTextViewText(R.id.tv_name_artist_notification, song.getNameArtist());
         remoteViews.setImageViewUri(R.id.img_notification, Uri.parse(song.getThumbnail()));
+        remoteViews.setImageViewResource(R.id.img_pre_notification, R.drawable.prev_icon2);
+        remoteViews.setImageViewResource(R.id.img_next_notification, R.drawable.next_icon2);
 
         Intent pauseIntent = new Intent("com.example.spotify_cloneapp.ACTION_PAUSE_MUSIC");
         PendingIntent pausePendingIntent = PendingIntent.getBroadcast(this, 0,
                 pauseIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         remoteViews.setOnClickPendingIntent(R.id.img_play_or_pause_notification, pausePendingIntent);
+
+        Intent previousIntent = new Intent("com.example.spotify_cloneapp.ACTION_PREVIOUS");
+        PendingIntent previousPendingIntent = PendingIntent.getBroadcast(this, 0,
+                previousIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        remoteViews.setOnClickPendingIntent(R.id.img_pre_notification, previousPendingIntent);
+
+        Intent nextIntent = new Intent("com.example.spotify_cloneapp.ACTION_NEXT");
+        PendingIntent nextPendingIntent = PendingIntent.getBroadcast(this, 0,
+                nextIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        remoteViews.setOnClickPendingIntent(R.id.img_next_notification, nextPendingIntent);
 
         noti = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setSmallIcon(R.drawable.spotify)
@@ -196,11 +210,15 @@ public class MusicService extends Service {
     }
 
     private void playPreviousSong() {
-        // Đưa ra logic để chuyển đến bài hát trước đó và bắt đầu phát nhạc
+        Intent intent = new Intent(this, MusicPlayerActivity.class);
+        intent.setAction("ACTION_PREVIOUS");
+        startActivity(intent);
     }
 
     private void playNextSong() {
-        // Đưa ra logic để chuyển đến bài hát tiếp theo và bắt đầu phát nhạc
+        Intent intent = new Intent(this, MusicPlayerActivity.class);
+        intent.setAction("ACTION_NEXT");
+        startActivity(intent);
     }
 
     @Override

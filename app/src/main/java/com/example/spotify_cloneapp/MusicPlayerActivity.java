@@ -113,12 +113,20 @@ public class MusicPlayerActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         if (intent != null) {
-            int idSong = intent.getIntExtra("idSong", position);
-            String albumName = intent.getStringExtra("albumName");
-            isContinue=intent.getBooleanExtra("isContinue",false);
-            this.albumName.setText(albumName);
-            queue = getQueue(albumName);
-            if (!apiCalled) {
+            if("ACTION_PREVIOUS".equals(intent.getAction())){
+                prevSong();
+            }
+            else if("ACTION_NEXT".equals(intent.getAction())){
+                nextSong();
+            }
+            else {
+                int idSong = intent.getIntExtra("idSong", position);
+                String albumName = intent.getStringExtra("albumName");
+                isContinue=intent.getBooleanExtra("isContinue",false);
+
+                this.albumName.setText(albumName);
+                queue = getQueue(albumName);
+                if (!apiCalled) {
                     Service.api.getSongsById(idSong).enqueue(new Callback<List<Song>>() {
                         @Override
                         public void onResponse(Call<List<Song>> call, Response<List<Song>> response) {
@@ -137,41 +145,43 @@ public class MusicPlayerActivity extends AppCompatActivity {
 
                         }
                     });
-                if(queue==null){
-                    queue=new ArrayList<>();
-                    queue.add(song);
-                }
-                if(queue.size()>1){
-                    for (int i = 0; i < queue.size(); i++) {
-                        if (queue.get(i).getID_Song() == idSong) {
-                            song = queue.get(i);
-                            break;
+                    if(queue==null){
+                        queue=new ArrayList<>();
+                        queue.add(song);
+                    }
+                    if(queue.size()>1){
+                        for (int i = 0; i < queue.size(); i++) {
+                            if (queue.get(i).getID_Song() == idSong) {
+                                song = queue.get(i);
+                                break;
+                            }
                         }
                     }
                 }
+
+                seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                        if (fromUser && mediaPlayer != null) {
+                            mediaPlayer.seekTo(progress * 1000);
+                        }
+                        if(progress==seekBar.getMax()){
+                            nextSong();
+                        }
+                    }
+
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {
+
+                    }
+
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {
+
+                    }
+                });
             }
 
-            seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                @Override
-                public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                    if (fromUser && mediaPlayer != null) {
-                        mediaPlayer.seekTo(progress * 1000);
-                    }
-                    if(progress==seekBar.getMax()){
-                        nextSong();
-                    }
-                }
-
-                @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {
-
-                }
-
-                @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {
-
-                }
-            });
         }
 
     }
