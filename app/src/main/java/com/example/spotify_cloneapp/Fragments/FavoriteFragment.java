@@ -117,6 +117,7 @@ public class FavoriteFragment extends Fragment {
         playlists.addAll(playlisttbl.getAllPlaylist());
         System.out.println(playlists.size());
         playlistAdapter.notifyDataSetChanged();
+        Toast.makeText(view.getContext(), "" + playlists.size(), Toast.LENGTH_SHORT).show();
     }
 
     private void AddPlaylist() {

@@ -1,6 +1,5 @@
 package com.example.spotify_cloneapp.Adapters;
 
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,7 +8,7 @@ import android.widget.TextView;
 
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.spotify_cloneapp.AlbumDetailActivity;
+import com.example.spotify_cloneapp.MainActivity;
 import com.example.spotify_cloneapp.Models.Album;
 import com.example.spotify_cloneapp.R;
 import com.squareup.picasso.Picasso;
@@ -20,6 +19,11 @@ import java.util.List;
 public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.SongViewHolder> {
 
     private List<Album> albumList;
+    private MainActivity context;
+
+    public void setContext(MainActivity context) {
+        this.context = context;
+    }
 
     public AlbumAdapter() {
         this.albumList = new ArrayList<>();
@@ -58,9 +62,10 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.SongViewHold
         holder.thumbnail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(), AlbumDetailActivity.class);
-                intent.putExtra("idAlbum", album.getID_Album());
-                v.getContext().startActivity(intent);
+//                Intent intent = new Intent(v.getContext(), AlbumDetailActivity.class);
+//                intent.putExtra("idAlbum", album.getID_Album());
+                context.callAlbumDetailFragment(album.getID_Album());
+//                ((Activity) context).startActivityForResult(intent, 101);
             }
         });
     }

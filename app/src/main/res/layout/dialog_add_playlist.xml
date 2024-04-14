@@ -17,6 +17,7 @@
         android:layout_height="wrap_content"
         android:hint="Description" />
 </LinearLayout>
+<<<<<<< HEAD
 
 
     <!--    <TextView-->
@@ -68,3 +69,5 @@
 <!--        app:layout_constraintStart_toStartOf="parent"-->
 <!--        android:id="@+id/dialog_addplaylist_Huy"-->
 <!--        app:layout_constraintTop_toTopOf="parent" />-->
+=======
+>>>>>>> origin/master

@@ -49,6 +49,7 @@ public class SearchFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
+
     public SearchFragment() {
         // Required empty public constructor
     }
@@ -93,11 +94,13 @@ public class SearchFragment extends Fragment {
         searchSongRV = v.findViewById(R.id.idRVSongs);
         searchAlbumRV = v.findViewById(R.id.idRVAblums);
         songAdapter = new SongAdapter();
+        songAdapter.setContext(getActivity());
         albumAdapter = new AlbumAdapter();
 
 
         songList = songAdapter.getSongList();
         albumList = albumAdapter.getAlbumList();
+
 
         searchSongRV.setAdapter(songAdapter);
         searchAlbumRV.setAdapter(albumAdapter);
