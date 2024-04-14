@@ -1,7 +1,5 @@
 package com.example.spotify_cloneapp.Adapters;
 
-
-
 import android.content.Context;
 import android.content.DialogInterface;
 import android.view.LayoutInflater;
@@ -30,6 +28,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Playli
     private ArrayList<Playlist> playlists;
     private String namePlaylist;
     private Context mContext;
+    public PlayListDB playlisttbl = new PlayListDB(mContext,"playlist", null, 1);;
 
 
     public PlaylistAdapter(Context mContext, ArrayList<Playlist> mData) {
@@ -52,7 +51,6 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Playli
         // Đặt hình ảnh và các sự kiện khác ở đây
         holder.namePlaylist.setText(playlist.getName());
         holder.description.setText(playlist.getDescription());
-
 
         try{
             Picasso.get().load(playlist.getThumbnail()).placeholder(R.drawable.hinhnen).into(holder.thumbnail);
@@ -78,6 +76,9 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Playli
         public TextView namePlaylist;
         public TextView description;
         public ImageView thumbnail;
+
+        // Khởi tạo playlistAdapter
+
 
         private static final String TAG = "MyViewHolder";
         ImageButton imageButton;
@@ -135,7 +136,6 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Playli
             builder.setView(dialogView);
 
             EditText editTextName = dialogView.findViewById(R.id.update_Name);
-            EditText edmota = dialogView.findViewById(R.id.update_Mota);
             // Tìm các View khác và thiết lập giá trị tương ứng của playlist
 
             builder.setPositiveButton("Lưu", new DialogInterface.OnClickListener() {
@@ -143,12 +143,10 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Playli
                 public void onClick(DialogInterface dialog, int which) {
                     // Lấy thông tin mới từ giao diện chỉnh sửa
                     String newName = editTextName.getText().toString();
-                    String mott = edmota.getText().toString();
                     // Lấy thông tin khác tương ứng với các View khác
 
                     // Cập nhật thông tin mới vào cơ sở dữ liệu
                     playlist.setName(newName);
-                    playlist.setDescription(mott);
                     // Cập nhật thông tin khác
 
                 }

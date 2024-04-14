@@ -43,9 +43,9 @@ public class FavoriteFragment extends Fragment {
     private String mParam2;
     private RecyclerView idRVPlaylist;
     private PlaylistAdapter playlistAdapter;
-    private PlayListDB playlisttbl;
-    private PlaylistSongDB playlistSongtbl;
 
+    private PlaylistSongDB playlistSongtbl;
+    private PlayListDB playlisttbl;
     private ArrayList<Playlist> playlists = new ArrayList<>();
     private LinearLayout btnAddPlaylist;
 
@@ -94,9 +94,9 @@ public class FavoriteFragment extends Fragment {
     private void loadComponent(View view) {
         idRVPlaylist = view.findViewById(R.id.idRVPlaylist);
         btnAddPlaylist = view.findViewById(R.id.btnAddPlaylist);
-        playlisttbl = new PlayListDB(this.getContext(),"playlist", null, 1);
-        playlistSongtbl = new PlaylistSongDB(this.getContext(), "playlistSong", null, 1);
 
+        playlistSongtbl = new PlaylistSongDB(this.getContext(), "playlistSong", null, 1);
+        playlisttbl = new PlayListDB(this.getContext(),"playlist", null, 1);
         // Khởi tạo playlistAdapter
         playlistAdapter = new PlaylistAdapter(view.getContext(), playlists);
         idRVPlaylist.setAdapter(playlistAdapter);
