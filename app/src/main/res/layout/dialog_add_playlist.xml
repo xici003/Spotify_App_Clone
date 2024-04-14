@@ -17,57 +17,5 @@
         android:layout_height="wrap_content"
         android:hint="Description" />
 </LinearLayout>
-<<<<<<< HEAD
 
 
-    <!--    <TextView-->
-<!--        android:id="@+id/textView2"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="30dp"-->
-<!--        android:layout_marginTop="200dp"-->
-<!--        android:text="Đặt tên cho danh sách phát của bạn"-->
-<!--        android:textColor="@color/white"-->
-<!--        android:textSize="20sp"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toTopOf="parent" />-->
-
-<!--    <EditText-->
-<!--        android:id="@+id/dialog_addplaylist_edName"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_margin="20dp"-->
-<!--        android:text="Danh sách phát của tôi"-->
-<!--        android:textColor="@color/white"-->
-<!--        android:textSize="25dp"-->
-<!--        android:gravity="center"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toBottomOf="@+id/textView2" />-->
-
-<!--    <Button-->
-<!--        android:id="@+id/dialog_addplaylist_btnTao"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginTop="100dp"-->
-<!--        android:backgroundTint="#00963C"-->
-<!--        android:text="Tạo"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintHorizontal_bias="0.498"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toBottomOf="@+id/dialog_addplaylist_edName" />-->
-
-<!--    <TextView-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginTop="32dp"-->
-<!--        android:text="Hủy"-->
-<!--        android:textColor="@color/white"-->
-<!--        android:textSize="20dp"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintHorizontal_bias="0.053"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        android:id="@+id/dialog_addplaylist_Huy"-->
-<!--        app:layout_constraintTop_toTopOf="parent" />-->
-=======
->>>>>>> origin/master

@@ -3,6 +3,7 @@ package com.example.spotify_cloneapp.Adapters;
 
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -153,7 +154,6 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Playli
                     playlist.setName(newName);
                     playlist.setDescription(mott);
                     // Cập nhật thông tin khác
-
                 }
             });
 
