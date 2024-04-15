@@ -98,7 +98,7 @@ public class FavoriteFragment extends Fragment {
         playlistSongtbl = new PlaylistSongDB(this.getContext(), "playlistSong", null, 1);
         playlisttbl = new PlayListDB(this.getContext(),"playlist", null, 1);
         // Khởi tạo playlistAdapter
-        playlistAdapter = new PlaylistAdapter(view.getContext(), playlists);
+        playlistAdapter = new PlaylistAdapter(view.getContext(), playlists, playlisttbl);
         idRVPlaylist.setAdapter(playlistAdapter);
 
         LoadRV();

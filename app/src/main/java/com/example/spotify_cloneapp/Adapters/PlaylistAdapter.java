@@ -28,12 +28,13 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Playli
     private ArrayList<Playlist> playlists;
     private String namePlaylist;
     private Context mContext;
-    public PlayListDB playlisttbl = new PlayListDB(mContext,"playlist", null, 1);;
+    public PlayListDB playlisttbl;
 
 
-    public PlaylistAdapter(Context mContext, ArrayList<Playlist> mData) {
+    public PlaylistAdapter(Context mContext, ArrayList<Playlist> mData, PlayListDB playlisttbl) {
         this.mContext = mContext;
         this.playlists = mData;
+        this.playlisttbl = playlisttbl;
     }
 
     @NonNull
@@ -77,7 +78,6 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Playli
         public TextView description;
         public ImageView thumbnail;
 
-        // Khởi tạo playlistAdapter
 
 
         private static final String TAG = "MyViewHolder";
@@ -136,6 +136,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Playli
             builder.setView(dialogView);
 
             EditText editTextName = dialogView.findViewById(R.id.update_Name);
+            EditText editMoTa = dialogView.findViewById(R.id.update_Mota);
             // Tìm các View khác và thiết lập giá trị tương ứng của playlist
 
             builder.setPositiveButton("Lưu", new DialogInterface.OnClickListener() {
@@ -144,11 +145,13 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Playli
                     // Lấy thông tin mới từ giao diện chỉnh sửa
                     String newName = editTextName.getText().toString();
                     // Lấy thông tin khác tương ứng với các View khác
-
+                    String newMota = editMoTa.getText().toString();
                     // Cập nhật thông tin mới vào cơ sở dữ liệu
                     playlist.setName(newName);
+                    playlist.setDescription(newMota);
                     // Cập nhật thông tin khác
-
+                    playlisttbl.UpdatePlaylist(playlist, playlist.getId());
+                    notifyDataSetChanged();
                 }
             });
 
@@ -172,9 +175,13 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Playli
             builder.create().show();
         }
         private void deletePlaylist(int position) {
+            Playlist playlist = playlists.get(position);
+            int playlistId = playlist.getId(); // Lấy id của playlist
+            playlisttbl.DeletePlaylist(playlistId); // Truyền id vào phương thức DeletePlaylist
             playlists.remove(position);
             notifyDataSetChanged(); // Cập nhật RecyclerView
         }
+
     }
 
 }
