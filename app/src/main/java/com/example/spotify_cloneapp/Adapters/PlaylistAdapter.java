@@ -1,10 +1,7 @@
 package com.example.spotify_cloneapp.Adapters;
 
-
-
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,23 +19,22 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.spotify_cloneapp.Database.PlayListDB;
 import com.example.spotify_cloneapp.Models.Playlist;
-import com.example.spotify_cloneapp.Models.Song;
-import com.example.spotify_cloneapp.MusicPlayerActivity;
 import com.example.spotify_cloneapp.R;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.PlaylistViewHolder> {
     private ArrayList<Playlist> playlists;
     private String namePlaylist;
     private Context mContext;
+    public PlayListDB playlisttbl;
 
 
-    public PlaylistAdapter(Context mContext, ArrayList<Playlist> mData) {
+    public PlaylistAdapter(Context mContext, ArrayList<Playlist> mData, PlayListDB playlisttbl) {
         this.mContext = mContext;
         this.playlists = mData;
+        this.playlisttbl = playlisttbl;
     }
 
     @NonNull
@@ -56,7 +52,6 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Playli
         // Đặt hình ảnh và các sự kiện khác ở đây
         holder.namePlaylist.setText(playlist.getName());
         holder.description.setText(playlist.getDescription());
-
 
         try{
             Picasso.get().load(playlist.getThumbnail()).placeholder(R.drawable.hinhnen).into(holder.thumbnail);
@@ -82,6 +77,8 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Playli
         public TextView namePlaylist;
         public TextView description;
         public ImageView thumbnail;
+
+
 
         private static final String TAG = "MyViewHolder";
         ImageButton imageButton;
@@ -139,7 +136,7 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Playli
             builder.setView(dialogView);
 
             EditText editTextName = dialogView.findViewById(R.id.update_Name);
-            EditText edmota = dialogView.findViewById(R.id.update_Mota);
+            EditText editMoTa = dialogView.findViewById(R.id.update_Mota);
             // Tìm các View khác và thiết lập giá trị tương ứng của playlist
 
             builder.setPositiveButton("Lưu", new DialogInterface.OnClickListener() {
@@ -147,13 +144,14 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Playli
                 public void onClick(DialogInterface dialog, int which) {
                     // Lấy thông tin mới từ giao diện chỉnh sửa
                     String newName = editTextName.getText().toString();
-                    String mott = edmota.getText().toString();
                     // Lấy thông tin khác tương ứng với các View khác
-
+                    String newMota = editMoTa.getText().toString();
                     // Cập nhật thông tin mới vào cơ sở dữ liệu
                     playlist.setName(newName);
-                    playlist.setDescription(mott);
+                    playlist.setDescription(newMota);
                     // Cập nhật thông tin khác
+                    playlisttbl.UpdatePlaylist(playlist, playlist.getId());
+                    notifyDataSetChanged();
                 }
             });
 
@@ -177,9 +175,13 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Playli
             builder.create().show();
         }
         private void deletePlaylist(int position) {
+            Playlist playlist = playlists.get(position);
+            int playlistId = playlist.getId(); // Lấy id của playlist
+            playlisttbl.DeletePlaylist(playlistId); // Truyền id vào phương thức DeletePlaylist
             playlists.remove(position);
             notifyDataSetChanged(); // Cập nhật RecyclerView
         }
+
     }
 
 }
