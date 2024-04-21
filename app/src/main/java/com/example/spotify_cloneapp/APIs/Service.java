@@ -11,10 +11,11 @@ import retrofit2.Call;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
-import retrofit2.http.Query;
+import retrofit2.http.Path;
 
 public interface Service {
-    String BASE_SONG_URL = "https://spotifybygoats.000webhostapp.com/Server/";
+//    String BASE_SONG_URL = "https://spotifybygoats.000webhostapp.com/Server/";
+    String BASE_SONG_URL = "http://192.168.48.212:5000/";
     Gson gson = new GsonBuilder()
             .setDateFormat("dd-MM-yyyy")
             .create();
@@ -25,18 +26,18 @@ public interface Service {
             .build()
             .create(Service.class);
 
-    @GET("Song.php")
+    @GET("song/getall")
     Call<List<Song>> getAllSong();
-    @GET("Album.php")
+    @GET("album/getall")
     Call<List<Album>> getAllAlbum();
-    @GET("Song.php")
-    Call<List<Song>> getSongsByAlbum(@Query("idAlbum") int idAlbum);
-    @GET("Album.php")
-    Call<List<Album>> getAlbumById(@Query("idAlbum") int idAlbum);
-    @GET("Song.php")
-    Call<List<Song>> getSongsById(@Query("idSong") int idSong);
-    @GET("Song.php")
-    Call<List<Song>> getSongByName(@Query("Name") String name);
-    @GET("Album.php")
-    Call<List<Album>> getAlbumByName(@Query("Name") String name);
+    @GET("song/getSongsbyAlbum/{id}")
+    Call<List<Song>> getSongsByAlbum(@Path("id") int idAlbum);
+    @GET("album/getAlbumById/{id}")
+    Call<List<Album>> getAlbumById(@Path("id") int albumId);
+    @GET("song/getSongById/{id}")
+    Call<List<Song>> getSongsById(@Path("id") int idSong);
+    @GET("song/getSongByName/{Name}")
+    Call<List<Song>> getSongByName(@Path("Name") String name);
+    @GET("album/getAlbumByName/{Name}")
+    Call<List<Album>> getAlbumByName(@Path("Name") String name);
 }

@@ -6,12 +6,6 @@ public class Album {
     private String Description;
     private String Duration;
     private String Thumbnail;
-    private  String Type;
-    private int SongCount;
-    private String NgayPhatHanh;
-    private String InLibrary;
-    private int Liked;
-    private int DownloadState;
 
     public int getID_Album() {
         return ID_Album;
@@ -33,27 +27,5 @@ public class Album {
         return Thumbnail;
     }
 
-    public String getType() {
-        return Type;
-    }
 
-    public int getSongCount() {
-        return SongCount;
-    }
-
-    public String getNgayPhatHanh() {
-        return NgayPhatHanh;
-    }
-
-    public String getInLibrary() {
-        return InLibrary;
-    }
-
-    public int getLiked() {
-        return Liked;
-    }
-
-    public int getDownloadState() {
-        return DownloadState;
-    }
 }

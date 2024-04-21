@@ -2,9 +2,6 @@ package com.example.spotify_cloneapp;
 
 import static com.example.spotify_cloneapp.MyApplication.CHANNEL_ID;
 
-import static org.chromium.base.ThreadUtils.runOnUiThread;
-
-import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -13,9 +10,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
@@ -23,26 +17,26 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.widget.ImageView;
 import android.widget.RemoteViews;
-import android.widget.Toast;
 
-import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 
+import com.example.spotify_cloneapp.Fragments.MusicFragment;
 import com.example.spotify_cloneapp.Models.Song;
 
-import org.chromium.base.task.AsyncTask;
-
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.util.List;
 
 public class MusicService extends Service {
     private MediaPlayer mediaPlayer;
     private ImageView btnPauseOrPlay;
     private RemoteViews remoteViews;
     private Notification noti;
+    private Context mContext;
+
+    public MusicService() {
+    }
+
+    private List<Song> queue;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -114,6 +108,7 @@ public class MusicService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        mContext = getApplicationContext();
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction("com.example.spotify_cloneapp.ACTION_PAUSE_MUSIC");
         intentFilter.addAction("com.example.spotify_cloneapp.ACTION_PREVIOUS");
@@ -140,15 +135,14 @@ public class MusicService extends Service {
             return mediaPlayer;
         }
     }
-    private void startMusic(Song song) {
+    public void startMusic(Song song, List<Song> queue) {
         if(mediaPlayer == null){
-            mediaPlayer = MediaPlayer.create(getApplicationContext(),
-                    Uri.parse(song.getURLmp3()));
+            mediaPlayer = MediaPlayer.create(mContext, Uri.parse(song.getURLmp3()));
         }
         mediaPlayer.start();
     }
     private void sendNotification(Song song) {
-        Intent intent = new Intent(this, MusicPlayerActivity.class);
+        Intent intent = new Intent(this, MusicFragment.class);
         intent.putExtra("song", song); // Đưa dữ liệu về bài hát hiện tại vào Intent
 
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
@@ -210,13 +204,13 @@ public class MusicService extends Service {
     }
 
     private void playPreviousSong() {
-        Intent intent = new Intent(this, MusicPlayerActivity.class);
+        Intent intent = new Intent(this, MusicFragment.class);
         intent.setAction("ACTION_PREVIOUS");
         startActivity(intent);
     }
 
     private void playNextSong() {
-        Intent intent = new Intent(this, MusicPlayerActivity.class);
+        Intent intent = new Intent(this, MusicFragment.class);
         intent.setAction("ACTION_NEXT");
         startActivity(intent);
     }

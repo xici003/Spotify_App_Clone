@@ -4,10 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,11 +11,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.spotify_cloneapp.APIs.Service;
 import com.example.spotify_cloneapp.Adapters.SongAdapter;
+import com.example.spotify_cloneapp.MainActivity;
 import com.example.spotify_cloneapp.Models.Album;
 import com.example.spotify_cloneapp.Models.Song;
-import com.example.spotify_cloneapp.MusicPlayerActivity;
 import com.example.spotify_cloneapp.R;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
@@ -52,6 +51,7 @@ public class AlbumDetailFragment extends Fragment {
     private TextView albumNameTV;
     private TextView albumDescriptionTV;
     private ImageView playAllSongs;
+    private List<Song> queue;
     public AlbumDetailFragment() {
         // Required empty public constructor
     }
@@ -108,7 +108,7 @@ public class AlbumDetailFragment extends Fragment {
 
             @Override
             public void onFailure(Call<List<Album>> call, Throwable t) {
-                // Xử lý lỗi
+                t.printStackTrace();
             }
         });
     }
@@ -134,7 +134,7 @@ public class AlbumDetailFragment extends Fragment {
         playAllSongs.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent=new Intent(getContext(), MusicPlayerActivity.class);
+                Intent intent=new Intent(getContext(), MusicFragment.class);
                 intent.putExtra("idSong",songsOfAlbumAdapter.getSongList().get(0).getID_Song());
                 intent.putExtra("albumName",album.getName());
                 getActivity().startActivityForResult(intent,103);
@@ -150,7 +150,7 @@ public class AlbumDetailFragment extends Fragment {
         songsOfAlbumAdapter=new SongAdapter();
 
         songsOfAlbumRV.setAdapter(songsOfAlbumAdapter);
-        songsOfAlbumAdapter.setContext(getActivity());
+        songsOfAlbumAdapter.setContext((MainActivity) getActivity());
 
         setPlayAllSongs();
     }

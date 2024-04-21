@@ -1,11 +1,15 @@
 package com.example.spotify_cloneapp.Models;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
 
 public class Song implements Serializable {
     private int ID_Song;
     private String Thumbnail;
     private String URLmp3;
+
+    @SerializedName("Name")
     private String nameSong;
     private String Duration;
     private String Category;

@@ -1,15 +1,14 @@
 package com.example.spotify_cloneapp;
 
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
+import android.Manifest;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.os.Build;
 import android.os.Bundle;
-import android.Manifest;
+import android.os.IBinder;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -30,6 +29,7 @@ import com.example.spotify_cloneapp.Database.PlaylistSongDB;
 import com.example.spotify_cloneapp.Fragments.AlbumDetailFragment;
 import com.example.spotify_cloneapp.Fragments.FavoriteFragment;
 import com.example.spotify_cloneapp.Fragments.HomeFragment;
+import com.example.spotify_cloneapp.Fragments.MusicFragment;
 import com.example.spotify_cloneapp.Fragments.SearchFragment;
 import com.example.spotify_cloneapp.Models.Album;
 import com.example.spotify_cloneapp.Models.Playlist;
@@ -63,12 +63,49 @@ public class MainActivity extends AppCompatActivity {
     PlaylistSongDB playlistSongtbl;
     private Song currentSong;
     private String albumName;
+    private MusicService musicService;
+    private List<Song> queue;
+    private MediaPlayer mediaPlayer;
+    private boolean isServiceBound = false;
+    private ServiceConnection serviceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            MusicService.LocalBinder binder = (MusicService.LocalBinder) service;
+            musicService = binder.getService();
+            isServiceBound = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            isServiceBound = false;
+        }
+    };
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (isServiceBound) {
+            unbindService(serviceConnection);
+            isServiceBound = false;
+        }
+        Intent stopServiceIntent = new Intent(this, MusicService.class);
+        stopService(stopServiceIntent);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        musicService = new MusicService();
+        Intent startServiceIntent = new Intent(this, MusicService.class);
+        startService(startServiceIntent);
+
+        // Liên kết dịch vụ
+        Intent bindServiceIntent = new Intent(this, MusicService.class);
+        bindService(bindServiceIntent, serviceConnection, Context.BIND_AUTO_CREATE);
+
         homeFragment= new HomeFragment();
         loadDataRecommendAlbum();
         replaceFragment(homeFragment);
@@ -98,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
 
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         setupPlayerBottom();
-        InitDB();
+//        InitDB();
     }
 
     private void InitDB() {
@@ -156,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // MusicService không phát nhạc, khởi động MusicPlayerActivity
-                Intent intent = new Intent(v.getContext(), MusicPlayerActivity.class);
+                Intent intent = new Intent(v.getContext(), MusicFragment.class);
                 intent.putExtra("idSong",currentSong.getID_Song());
                 intent.putExtra("albumName", albumName);
                 intent.putExtra("isContinue",true);
@@ -216,13 +253,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        Intent intent = new Intent(this, MusicService.class);
-        stopService(intent);
-    }
-
-    @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(resultCode==118 && requestCode==103){
@@ -245,5 +275,19 @@ public class MainActivity extends AppCompatActivity {
         bundle.putInt("idAlbum",idAlbum);
         albumDetailFragment.setArguments(bundle);
         replaceFragment(albumDetailFragment);
+    }
+
+    public void startMusic(Song song) {
+        if (isServiceBound && musicService != null) {
+            MusicFragment musicFragment = new MusicFragment(song, mediaPlayer);
+            replaceFragment(musicFragment);
+            musicService.startMusic(song, queue);
+        } else {
+            Toast.makeText(musicService, "No service", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void setListSong(List<Song> songList) {
+        queue = songList;
     }
 }

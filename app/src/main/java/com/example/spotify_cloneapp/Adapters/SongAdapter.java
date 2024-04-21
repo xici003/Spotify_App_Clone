@@ -1,16 +1,15 @@
 package com.example.spotify_cloneapp.Adapters;
 
-import android.app.Activity;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.spotify_cloneapp.MainActivity;
 import com.example.spotify_cloneapp.Models.Song;
-import com.example.spotify_cloneapp.MusicPlayerActivity;
 import com.example.spotify_cloneapp.R;
 import com.squareup.picasso.Picasso;
 
@@ -20,7 +19,7 @@ import java.util.List;
 public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder> {
 
     private List<Song> songList;
-    private Activity context;
+    private MainActivity context;
     private String albumName;
 
     public SongAdapter() {
@@ -29,7 +28,7 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
     public void setSongList(List<Song> songList) {
         this.songList.addAll(songList);
     }
-    public void setContext(Activity context) {
+    public void setContext(MainActivity context) {
         this.context = context;
     }
     public List<Song> getSongList() {
@@ -56,10 +55,12 @@ public class SongAdapter extends RecyclerView.Adapter<SongAdapter.SongViewHolder
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(), MusicPlayerActivity.class);
-                intent.putExtra("idSong",song.getID_Song());
-                intent.putExtra("albumName", albumName);
-                context.startActivityForResult(intent,103);
+//                Intent intent = new Intent(v.getContext(), MusicPlayerFragment.class);
+//                intent.putExtra("idSong",song.getID_Song());
+//                intent.putExtra("albumName", albumName);
+//                context.startActivityForResult(intent,103);
+                context.setListSong(songList);
+                context.startMusic(song);
             }
         });
     }

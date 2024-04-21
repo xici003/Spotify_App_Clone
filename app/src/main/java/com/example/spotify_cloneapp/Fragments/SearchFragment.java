@@ -1,26 +1,24 @@
 package com.example.spotify_cloneapp.Fragments;
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.Toast;
+
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.spotify_cloneapp.APIs.Service;
 import com.example.spotify_cloneapp.Adapters.AlbumAdapter;
 import com.example.spotify_cloneapp.Adapters.SongAdapter;
+import com.example.spotify_cloneapp.MainActivity;
 import com.example.spotify_cloneapp.Models.Album;
 import com.example.spotify_cloneapp.Models.Song;
 import com.example.spotify_cloneapp.R;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -94,7 +92,7 @@ public class SearchFragment extends Fragment {
         searchSongRV = v.findViewById(R.id.idRVSongs);
         searchAlbumRV = v.findViewById(R.id.idRVAblums);
         songAdapter = new SongAdapter();
-        songAdapter.setContext(getActivity());
+        songAdapter.setContext((MainActivity) getActivity());
         albumAdapter = new AlbumAdapter();
 
 
