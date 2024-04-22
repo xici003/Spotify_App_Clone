@@ -35,7 +35,7 @@ public class MusicFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    private MainActivity mContext;
+    private String albumNameStr;
     private static MediaPlayer mediaPlayer;
     private TextView albumName, songName, artistName, lyrics, durationPlayed, durationTotal;
     private ImageView imgSong, playPauseBtn, nextBtn, prevBtn;
@@ -45,15 +45,16 @@ public class MusicFragment extends Fragment {
     private Handler handler = new Handler();
     private MusicService musicService;
 
-    public MusicFragment(Song song, MusicService musicService) {
+    public MusicFragment(Song song, MusicService musicService,String albumNameStr) {
         this.song = song;
         this.musicService = musicService;
+        this.albumNameStr=albumNameStr;
         mediaPlayer=musicService.getMediaPlayer();
     }
 
     // TODO: Rename and change types and number of parameters
-    public static MusicFragment newInstance(String param1, String param2, Song song, MusicService musicService) {
-        MusicFragment fragment = new MusicFragment(song, musicService);
+    public static MusicFragment newInstance(String param1, String param2, Song song, MusicService musicService, String al) {
+        MusicFragment fragment = new MusicFragment(song, musicService,al);
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -82,6 +83,7 @@ public class MusicFragment extends Fragment {
     }
 
     private void loadData(Song song) {
+        albumName.setText(albumNameStr);
         songName.setText(song.getNameSong());
         artistName.setText(song.getNameArtist());
         lyrics.setText(song.getLyrics());

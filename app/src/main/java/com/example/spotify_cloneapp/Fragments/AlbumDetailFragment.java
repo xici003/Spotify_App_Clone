@@ -55,7 +55,9 @@ public class AlbumDetailFragment extends Fragment {
     public AlbumDetailFragment() {
         // Required empty public constructor
     }
-
+    public String getAlbumName(){
+        return album.getName();
+    }
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.

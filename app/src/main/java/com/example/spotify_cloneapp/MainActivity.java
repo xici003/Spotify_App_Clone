@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.view.View;
@@ -108,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
 
         homeFragment= new HomeFragment();
         loadDataRecommendAlbum();
-        replaceFragment(homeFragment,false);
+        replaceFragment(homeFragment,false,"home_fragment");
 
         searchFragment=new SearchFragment();
         favoriteFragment=new FavoriteFragment();
@@ -119,13 +120,13 @@ public class MainActivity extends AppCompatActivity {
             if (itemId == MENU_HOME_ID) {
                 loadDataRecommendAlbum();
                 homeFragment.notifyDataChange();
-                replaceFragment(homeFragment,false);
+                replaceFragment(homeFragment,false,"home_fragment");
             }
             if (itemId == MENU_SEARCH_ID) {
-                replaceFragment(searchFragment,false);
+                replaceFragment(searchFragment,false,"search_fragment");
             }
             if (itemId == MENU_FAVOURITE_ID) {
-                replaceFragment(favoriteFragment,false);
+                replaceFragment(favoriteFragment,false,"favorite_fragment");
             }
             return true;
         });
@@ -135,6 +136,7 @@ public class MainActivity extends AppCompatActivity {
 
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         setupPlayerBottom();
+        updatePlayerVisibility(false);
 //        InitDB();
     }
 
@@ -171,19 +173,15 @@ public class MainActivity extends AppCompatActivity {
         txtSongName = findViewById(R.id.txtSongName);
         txtSongArtist = findViewById(R.id.txtSongArtist);
 
+
         iconPlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (audioManager.isMusicActive()) {
-                    // Tạm ngừng phát nhạc
-                    Intent pauseIntent = new Intent(getApplicationContext(), MusicService.class);
-                    pauseIntent.setAction("com.example.spotify_cloneapp.ACTION_PAUSE_MUSIC");
-                    startService(pauseIntent);
+                    musicService.pauseMusic();
                     iconPlay.setImageResource(R.drawable.play_icon);
                 } else {
-                    Intent continueIntent = new Intent(getApplicationContext(), MusicService.class);
-                    continueIntent.setAction("com.example.spotify_cloneapp.ACTION_CONTINUE_MUSIC");
-                    startService(continueIntent);
+                    musicService.continueMusic();
                     iconPlay.setImageResource(R.drawable.pause2_icon);
                 }
             }
@@ -192,12 +190,9 @@ public class MainActivity extends AppCompatActivity {
         layoutPlayerBottom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // MusicService không phát nhạc, khởi động MusicPlayerActivity
-                Intent intent = new Intent(v.getContext(), MusicFragment.class);
-                intent.putExtra("idSong",currentSong.getID_Song());
-                intent.putExtra("albumName", albumName);
-                intent.putExtra("isContinue",true);
-                startActivityForResult(intent,103);
+
+                replaceFragment(new MusicFragment(currentSong, musicService,albumName),true,"MUSIC_FRAGMENT");
+                updatePlayerVisibility(false);
             }
         });
     }
@@ -205,14 +200,16 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        updatePlayerVisibility();
     }
 
-    private void updatePlayerVisibility() {
-        if (audioManager != null && audioManager.isMusicActive()) {
+    private void updatePlayerVisibility(boolean isVisible){
+        if(isVisible){
             layoutPlayerBottom.setVisibility(View.VISIBLE);
             iconPlay.setImageResource(R.drawable.pause2_icon);
-        } else {
+            Picasso.get().load(Uri.parse(currentSong.getThumbnail())).placeholder(R.drawable.hinhnen).into(imgSong);
+            txtSongName.setText(currentSong.getNameSong());
+            txtSongArtist.setText(currentSong.getNameArtist());
+        }else{
             layoutPlayerBottom.setVisibility(View.INVISIBLE);
         }
     }
@@ -226,10 +223,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void replaceFragment(Fragment fragment,boolean isStack) {
+    private void replaceFragment(Fragment fragment,boolean isStack,String tag) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.frameLayout, fragment);
+        fragmentTransaction.replace(R.id.frameLayout, fragment,tag);
         if(isStack){
             fragmentTransaction.addToBackStack(null);
         }
@@ -262,19 +259,40 @@ public class MainActivity extends AppCompatActivity {
         Bundle bundle=new Bundle();
         bundle.putInt("idAlbum",idAlbum);
         albumDetailFragment.setArguments(bundle);
-        replaceFragment(albumDetailFragment,true);
+        replaceFragment(albumDetailFragment,true,"album_detail_fragment");
     }
 
     public void startMusic(Song song) {
         if (isServiceBound && musicService != null) {
             mediaPlayer=musicService.startMusic(song, queue);
-            MusicFragment musicFragment = new MusicFragment(song, musicService);
-            replaceFragment(musicFragment,true);
+            albumDetailFragment=(AlbumDetailFragment) getSupportFragmentManager().findFragmentByTag("album_detail_fragment");
+            if(albumDetailFragment!=null){
+                albumName=albumDetailFragment.getAlbumName();
+            }else {
+                albumName="";
+            }
+            MusicFragment musicFragment = new MusicFragment(song, musicService,albumName);
+
+            replaceFragment(musicFragment,true,"MUSIC_FRAGMENT");
+            updatePlayerVisibility(false);
         } else {
             Toast.makeText(musicService, "No service", Toast.LENGTH_SHORT).show();
         }
     }
     public void setListSong(List<Song> songList) {
         queue = songList;
+    }
+    @Override
+    public void onBackPressed() {
+        // Kiểm tra xem MusicFragment có đang được hiển thị hay không
+        MusicFragment musicFragment = (MusicFragment) getSupportFragmentManager().findFragmentByTag("MUSIC_FRAGMENT");
+        if (musicFragment != null && musicFragment.isVisible()) {
+            // Nếu MusicFragment đang được hiển thị, hiển thị BottomLayout
+            currentSong=musicService.getSong();
+            updatePlayerVisibility(true);
+            // Nếu không, hành động mặc định khi nhấn nút back sẽ được thực hiện
+        }
+        super.onBackPressed();
+
     }
 }

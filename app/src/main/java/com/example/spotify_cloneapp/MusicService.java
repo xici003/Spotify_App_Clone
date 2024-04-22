@@ -52,6 +52,10 @@ public class MusicService extends Service {
 
     private final IBinder binder = new LocalBinder();
 
+    public Song getSong() {
+        return currentSong;
+    }
+
     public class LocalBinder extends Binder {
         MusicService getService() {
             // Trả về instance của MusicService để clients có thể gọi các phương thức công cộng
@@ -189,9 +193,14 @@ public class MusicService extends Service {
                 @Override
                 public void onPrepared(MediaPlayer mp) {
                     mp.start();
-
                 }
             });
+//            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+//                @Override
+//                public void onCompletion(MediaPlayer mp) {
+//                    nextMusic();
+//                }
+//            });
 
         } catch (IOException e) {
             e.printStackTrace();
