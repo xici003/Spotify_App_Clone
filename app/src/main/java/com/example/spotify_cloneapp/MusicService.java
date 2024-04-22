@@ -189,8 +189,10 @@ public class MusicService extends Service {
                 @Override
                 public void onPrepared(MediaPlayer mp) {
                     mp.start();
+
                 }
             });
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -208,7 +210,7 @@ public class MusicService extends Service {
         }
     }
     public Song nextMusic(){
-        if(mediaPlayer != null && mediaPlayer.isPlaying()){
+        if(mediaPlayer != null){
             int pos=this.queueSong.indexOf(currentSong);
             currentSong=this.queueSong.get((pos+1)%this.queueSong.size());
             Uri uri = Uri.parse(currentSong.getURLmp3());
@@ -242,9 +244,6 @@ public class MusicService extends Service {
         Intent intent = new Intent(this, MusicFragment.class);
         intent.setAction("ACTION_NEXT");
         startActivity(intent);
-    }
-    public void setQueueSong(List<Song> queueSong) {
-        this.queueSong = queueSong;
     }
     @Override
     public void onDestroy() {

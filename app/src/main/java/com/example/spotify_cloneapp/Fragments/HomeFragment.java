@@ -38,7 +38,6 @@ public class HomeFragment extends Fragment {
     private String mParam1;
     private String mParam2;
     private CircleImageView avatar;
-
     private Service service;
     private RecyclerView recommendedAlbumRView;
     private RecyclerView popularAlbumRView;

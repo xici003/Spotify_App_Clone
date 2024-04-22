@@ -37,7 +37,6 @@ public class MusicFragment extends Fragment {
     private String mParam2;
     private MainActivity mContext;
     private static MediaPlayer mediaPlayer;
-
     private TextView albumName, songName, artistName, lyrics, durationPlayed, durationTotal;
     private ImageView imgSong, playPauseBtn, nextBtn, prevBtn;
     private SeekBar seekBar;
@@ -78,6 +77,7 @@ public class MusicFragment extends Fragment {
         View view =  inflater.inflate(R.layout.fragment_musicplayer_view, container, false);
         this.loadComponent(view);
         this.loadData(song);
+        setMediaPlayerAction();
         return view;
     }
 
@@ -85,11 +85,27 @@ public class MusicFragment extends Fragment {
         songName.setText(song.getNameSong());
         artistName.setText(song.getNameArtist());
         lyrics.setText(song.getLyrics());
-        durationTotal.setText(song.getDuration());
         Picasso.get().load(Uri.parse(song.getThumbnail())).placeholder(R.drawable.hinhnen).into(imgSong);
         seekBarAction();
+        handler.post(updateSeekBar);
     }
 
+    private Runnable updateSeekBar = new Runnable() {
+        @Override
+        public void run() {
+            if (mediaPlayer != null && mediaPlayer.isPlaying()) {
+                int mCurrentPosition = mediaPlayer.getCurrentPosition() / 1000;
+                seekBar.setProgress(mCurrentPosition);
+                durationPlayed.setText(formattedTime(mCurrentPosition));
+                handler.postDelayed(this, 1000);
+            }
+            if (seekBar.getProgress() == seekBar.getMax()-1) {
+                song = musicService.nextMusic();
+                loadData(song);
+                setMediaPlayerAction();
+            }
+        }
+    };
 
     private void seekBarAction() {
         if (mediaPlayer != null) {
@@ -109,25 +125,13 @@ public class MusicFragment extends Fragment {
 
                 @Override
                 public void onStopTrackingTouch(SeekBar seekBar) {
-                    handler.post(updateSeekBar);
+                    handler.post(updateSeekBar); // Tiếp tục cập nhật SeekBar khi người dùng dừng việc kéo
+
                 }
             });
-            handler.postDelayed(updateSeekBar, 1000);  // Bắt đầu cập nhật SeekBar
-            getActivity().runOnUiThread(updateSeekBar);
+            handler.postDelayed(updateSeekBar, 0);  // Bắt đầu cập nhật SeekBar ngay lập tức
         }
     }
-    private Runnable updateSeekBar = new Runnable() {
-        @Override
-        public void run() {
-            if (mediaPlayer != null) {
-                int mCurrentPosition = mediaPlayer.getCurrentPosition() / 1000;
-                seekBar.setProgress(mCurrentPosition);
-                durationPlayed.setText(formattedTime(mCurrentPosition));
-                System.out.println(durationPlayed.getText().toString());
-            }
-            handler.postDelayed(this, 1000);
-        }
-    };
 
     private String formattedTime(int mCurrentPosition) {
         String totalOut = "";
@@ -169,21 +173,35 @@ public class MusicFragment extends Fragment {
                 if (mediaPlayer.isPlaying()) {
                     musicService.pauseMusic();
                     playPauseBtn.setImageResource(R.drawable.play2_icon);
+                    handler.removeCallbacks(updateSeekBar);
                 } else {
                     musicService.continueMusic();
                     playPauseBtn.setImageResource(R.drawable.pause_icon);
+                    handler.post(updateSeekBar);
                 }
             }
         });
     }
+    private void setMediaPlayerAction(){
+        durationPlayed.setText("0:00");
+        mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                seekBar.setMax(mp.getDuration()/1000);
+                mp.start();
+                durationTotal.setText(formattedTime(mp.getDuration()/1000));
+                handler.post(updateSeekBar);
+            }
+        });
 
+    }
     private void setBtnNextandPre() {
         nextBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 song=musicService.nextMusic();
                 loadData(song);
-
+                setMediaPlayerAction();
             }
         });
         prevBtn.setOnClickListener(new View.OnClickListener() {
@@ -191,6 +209,7 @@ public class MusicFragment extends Fragment {
             public void onClick(View v) {
                 song=musicService.prevMusic();
                 loadData(song);
+                setMediaPlayerAction();
             }
         });
     }
