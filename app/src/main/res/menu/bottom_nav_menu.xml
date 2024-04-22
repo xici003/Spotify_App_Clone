@@ -14,4 +14,10 @@
         android:id="@+id/mnuFavorite"
         android:icon="@drawable/library_icon"
         android:title="Favourite" />
+
+    <item
+        android:id="@+id/mnuAccount"
+        android:icon="@drawable/profile"
+        android:visible="false"
+        android:title="Account" />
 </menu>

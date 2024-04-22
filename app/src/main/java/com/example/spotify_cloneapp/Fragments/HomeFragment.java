@@ -1,15 +1,18 @@
 package com.example.spotify_cloneapp.Fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.spotify_cloneapp.APIs.Service;
 import com.example.spotify_cloneapp.Adapters.AlbumAdapter;
+import com.example.spotify_cloneapp.LoginActivity;
 import com.example.spotify_cloneapp.MainActivity;
 import com.example.spotify_cloneapp.Models.Album;
 import com.example.spotify_cloneapp.R;
@@ -46,6 +49,7 @@ public class HomeFragment extends Fragment {
     private AlbumAdapter recommendedAlbumAdapter;
     private AlbumAdapter popularAlbumAdapter;
     private AlbumAdapter trendingAlbumAdapter;
+    private ImageView H_avatar;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -83,9 +87,19 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         this.loadComponent(view);
+
+        // action khi đăng nhập:
+        LoginAction();
         // Inflate the layout for this fragment
         this.loadData();
         return view;
+    }
+
+    private void LoginAction() {
+        H_avatar.setOnClickListener(v->{
+            Intent intent = new Intent(getContext(), LoginActivity.class);
+            startActivityForResult(intent, 111);
+        });
     }
 
     public void loadComponent(View view){
@@ -105,6 +119,7 @@ public class HomeFragment extends Fragment {
         popularAlbumRView.setAdapter(popularAlbumAdapter);
         trendingAlbum.setAdapter(trendingAlbumAdapter);
 
+        H_avatar = view.findViewById(R.id.H_avatar);
     }
 
     public void loadData(){
@@ -129,7 +144,6 @@ public class HomeFragment extends Fragment {
 
             }
         });
-
     }
     public void notifyDataChange(){
         recommendedAlbumAdapter.notifyDataSetChanged();

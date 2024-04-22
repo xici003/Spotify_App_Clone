@@ -24,35 +24,36 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import com.example.spotify_cloneapp.APIs.Service;
 import com.example.spotify_cloneapp.Database.PlayListDB;
 import com.example.spotify_cloneapp.Database.PlaylistSongDB;
+import com.example.spotify_cloneapp.Fragments.AccountFragment;
 import com.example.spotify_cloneapp.Fragments.AlbumDetailFragment;
 import com.example.spotify_cloneapp.Fragments.FavoriteFragment;
 import com.example.spotify_cloneapp.Fragments.HomeFragment;
 import com.example.spotify_cloneapp.Fragments.MusicFragment;
 import com.example.spotify_cloneapp.Fragments.SearchFragment;
-import com.example.spotify_cloneapp.Models.Album;
-import com.example.spotify_cloneapp.Models.Playlist;
+import com.example.spotify_cloneapp.Models.Account;
 import com.example.spotify_cloneapp.Models.Song;
 import com.example.spotify_cloneapp.databinding.ActivityMainBinding;
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
+    final int MENU_ACCOUNT_ID = R.id.mnuAccount;
     final int MENU_HOME_ID = R.id.mnuHome;
     final int MENU_SEARCH_ID = R.id.mnuSearch;
     final int MENU_FAVOURITE_ID = R.id.mnuFavorite;
     ActivityMainBinding binding;
     private HomeFragment homeFragment;
     private SearchFragment searchFragment;
+    private AccountFragment accountFragment;
     private FavoriteFragment favoriteFragment;
     private AlbumDetailFragment albumDetailFragment;
     private static final int PERMISSION_REQUEST_CODE = 1001;
@@ -68,6 +69,9 @@ public class MainActivity extends AppCompatActivity {
     private List<Song> queue;
     private MediaPlayer mediaPlayer;
     private boolean isServiceBound = false;
+    public static final String fileName = "Login.txt";
+    private boolean checkAccount = false;
+    private Account account;
     private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
@@ -99,6 +103,8 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        readFile();
+
         musicService = new MusicService();
         Intent startServiceIntent = new Intent(this, MusicService.class);
         startService(startServiceIntent);
@@ -113,6 +119,7 @@ public class MainActivity extends AppCompatActivity {
 
         searchFragment=new SearchFragment();
         favoriteFragment=new FavoriteFragment();
+        accountFragment=new AccountFragment(account);
 
         // Bottom Navigation View
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
@@ -128,6 +135,9 @@ public class MainActivity extends AppCompatActivity {
             if (itemId == MENU_FAVOURITE_ID) {
                 replaceFragment(favoriteFragment,false,"favorite_fragment");
             }
+            if (itemId == MENU_ACCOUNT_ID) {
+                replaceFragment(accountFragment,false, "account_fragment");
+            }
             return true;
         });
 
@@ -138,6 +148,57 @@ public class MainActivity extends AppCompatActivity {
         setupPlayerBottom();
         updatePlayerVisibility(false);
 //        InitDB();
+    }
+
+    private void readFile() {
+        boolean hasValidData = false;  // Cờ đánh dấu dữ liệu hợp lệ
+
+        try {
+            // Đảm bảo tệp tồn tại
+            FileOutputStream fos = openFileOutput(fileName, Context.MODE_APPEND);
+            fos.close();  // Đóng lại để đảm bảo tệp được tạo
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            FileInputStream fis = openFileInput(fileName);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
+
+            String idStr = reader.readLine();  // Đọc giá trị ID
+
+            if (idStr != null && !idStr.isEmpty()) {  // Kiểm tra giá trị null hoặc rỗng
+                int id = Integer.parseInt(idStr);  // Chuyển đổi thành số nguyên
+
+                String email = reader.readLine();  // Email
+                String name = reader.readLine();  // Tên
+                String password = reader.readLine();  // Mật khẩu
+                String thumbnail = reader.readLine();  // Ảnh đại diện
+
+                if (email != null && name != null && password != null && thumbnail != null) {
+                    // Kiểm tra xem tất cả các giá trị đã được đọc đúng chưa
+                    account = new Account(id, email, name, thumbnail, password);  // Khởi tạo đối tượng Account
+                    hasValidData = true;  // Đánh dấu dữ liệu hợp lệ
+                }
+            }
+
+            reader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Lỗi khi đọc tệp", Toast.LENGTH_SHORT).show();
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Lỗi khi chuyển đổi ID", Toast.LENGTH_SHORT).show();
+        }
+
+        if (hasValidData) {
+            checkAccount = true;
+            binding.bottomNavigationView.getMenu().findItem(R.id.mnuAccount).setVisible(true);
+        } else {
+            account = null;  // Nếu dữ liệu không hợp lệ, đặt account là null
+            checkAccount = false;
+            binding.bottomNavigationView.getMenu().findItem(R.id.mnuAccount).setVisible(false);
+        }
     }
 
     private void InitDB() {
@@ -155,14 +216,14 @@ public class MainActivity extends AppCompatActivity {
 //        playlistSongtbl.AddSongIntoPlaylist(11, 2);
 //        playlistSongtbl.AddSongIntoPlaylist(15, 2);
 
-        ArrayList<Playlist> playlists = playlisttbl.getAllPlaylist();
-        for (Playlist p: playlists){
-            System.out.println(p.getName());
-        }
-        ArrayList<Integer> index = playlistSongtbl.getAllSongInPlaylist(1);
-        for (int i : index){
-            System.out.println(i);
-        }
+//        ArrayList<Playlist> playlists = playlisttbl.getAllPlaylist();
+//        for (Playlist p: playlists){
+//            System.out.println(p.getName());
+//        }
+//        ArrayList<Integer> index = playlistSongtbl.getAllSongInPlaylist(1);
+//        for (int i : index){
+//            System.out.println(i);
+//        }
     }
 
     private void setupPlayerBottom() {
