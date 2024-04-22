@@ -108,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
 
         homeFragment= new HomeFragment();
         loadDataRecommendAlbum();
-        replaceFragment(homeFragment);
+        replaceFragment(homeFragment,false);
 
         searchFragment=new SearchFragment();
         favoriteFragment=new FavoriteFragment();
@@ -119,13 +119,13 @@ public class MainActivity extends AppCompatActivity {
             if (itemId == MENU_HOME_ID) {
                 loadDataRecommendAlbum();
                 homeFragment.notifyDataChange();
-                replaceFragment(homeFragment);
+                replaceFragment(homeFragment,false);
             }
             if (itemId == MENU_SEARCH_ID) {
-                replaceFragment(searchFragment);
+                replaceFragment(searchFragment,false);
             }
             if (itemId == MENU_FAVOURITE_ID) {
-                replaceFragment(favoriteFragment);
+                replaceFragment(favoriteFragment,false);
             }
             return true;
         });
@@ -226,30 +226,18 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void replaceFragment(Fragment fragment) {
+    private void replaceFragment(Fragment fragment,boolean isStack) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.frameLayout, fragment);
+        if(isStack){
+            fragmentTransaction.addToBackStack(null);
+        }
         fragmentTransaction.commit();
     }
 
     private void loadDataRecommendAlbum() {
-
-        Service.api.getAllAlbum().enqueue(new Callback<List<Album>>() {
-            @Override
-            public void onResponse(Call<List<Album>> call, Response<List<Album>> response) {
-                if(response.isSuccessful()){
-                    List<Album> data= response.body();
-                    homeFragment.loadData(data);
-                    homeFragment.notifyDataChange();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<Album>> call, Throwable t) {
-
-            }
-        });
+        homeFragment.loadData();
     }
 
     @Override
@@ -274,19 +262,18 @@ public class MainActivity extends AppCompatActivity {
         Bundle bundle=new Bundle();
         bundle.putInt("idAlbum",idAlbum);
         albumDetailFragment.setArguments(bundle);
-        replaceFragment(albumDetailFragment);
+        replaceFragment(albumDetailFragment,true);
     }
 
     public void startMusic(Song song) {
         if (isServiceBound && musicService != null) {
-            MusicFragment musicFragment = new MusicFragment(song, mediaPlayer);
-            replaceFragment(musicFragment);
-            musicService.startMusic(song, queue);
+            mediaPlayer=musicService.startMusic(song, queue);
+            MusicFragment musicFragment = new MusicFragment(song, musicService);
+            replaceFragment(musicFragment,true);
         } else {
             Toast.makeText(musicService, "No service", Toast.LENGTH_SHORT).show();
         }
     }
-
     public void setListSong(List<Song> songList) {
         queue = songList;
     }

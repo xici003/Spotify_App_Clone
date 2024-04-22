@@ -14,9 +14,13 @@ import com.example.spotify_cloneapp.MainActivity;
 import com.example.spotify_cloneapp.Models.Album;
 import com.example.spotify_cloneapp.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -81,6 +85,7 @@ public class HomeFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         this.loadComponent(view);
         // Inflate the layout for this fragment
+        this.loadData();
         return view;
     }
 
@@ -103,10 +108,29 @@ public class HomeFragment extends Fragment {
 
     }
 
-    public void loadData(List<Album> albumList){
-        recommendedAlbumAdapter.setAlbumList(albumList);
-        popularAlbumAdapter.setAlbumList(albumList);
-        trendingAlbumAdapter.setAlbumList(albumList);
+    public void loadData(){
+        Service.api.getAllAlbum().enqueue(new Callback<List<Album>>() {
+            @Override
+            public void onResponse(Call<List<Album>> call, Response<List<Album>> response) {
+                if(response.code()==500){
+                    loadData();
+                }
+                else{
+                    List<Album> albumList = new ArrayList<>();
+                    albumList.addAll(response.body());
+                    recommendedAlbumAdapter.setAlbumList(albumList);
+                    popularAlbumAdapter.setAlbumList(albumList);
+                    trendingAlbumAdapter.setAlbumList(albumList);
+                    notifyDataChange();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Album>> call, Throwable t) {
+
+            }
+        });
+
     }
     public void notifyDataChange(){
         recommendedAlbumAdapter.notifyDataSetChanged();

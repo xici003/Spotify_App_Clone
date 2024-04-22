@@ -15,7 +15,7 @@ import retrofit2.http.Path;
 
 public interface Service {
 //    String BASE_SONG_URL = "https://spotifybygoats.000webhostapp.com/Server/";
-    String BASE_SONG_URL = "http://192.168.48.212:5000/";
+    String BASE_SONG_URL = "http://192.168.57.98:5000/";
     Gson gson = new GsonBuilder()
             .setDateFormat("dd-MM-yyyy")
             .create();

@@ -28,15 +28,22 @@ import java.util.List;
 
 public class MusicService extends Service {
     private MediaPlayer mediaPlayer;
+
+    public MediaPlayer getMediaPlayer() {
+        return mediaPlayer;
+    }
+
     private ImageView btnPauseOrPlay;
     private RemoteViews remoteViews;
     private Notification noti;
     private Context mContext;
+    private Song currentSong;
 
     public MusicService() {
+        mediaPlayer=null;
     }
 
-    private List<Song> queue;
+    private List<Song> queueSong;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -115,32 +122,7 @@ public class MusicService extends Service {
         intentFilter.addAction("com.example.spotify_cloneapp.ACTION_NEXT");
         registerReceiver(broadcastReceiver, intentFilter);
     }
-    protected MediaPlayer getMusicPlayer(Song song) {
-        Uri uri = null;
-        if (song != null) {
-            uri = Uri.parse(song.getURLmp3());
-        }
 
-        if (mediaPlayer != null) {
-            mediaPlayer.stop();
-            mediaPlayer.release();
-        }
-        mediaPlayer = new MediaPlayer();
-        try {
-            mediaPlayer.setDataSource(getApplicationContext(), uri);
-            mediaPlayer.prepareAsync();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }finally {
-            return mediaPlayer;
-        }
-    }
-    public void startMusic(Song song, List<Song> queue) {
-        if(mediaPlayer == null){
-            mediaPlayer = MediaPlayer.create(mContext, Uri.parse(song.getURLmp3()));
-        }
-        mediaPlayer.start();
-    }
     private void sendNotification(Song song) {
         Intent intent = new Intent(this, MusicFragment.class);
         intent.putExtra("song", song); // Đưa dữ liệu về bài hát hiện tại vào Intent
@@ -184,6 +166,36 @@ public class MusicService extends Service {
 
         startForeground(1, noti);
     }
+    public MediaPlayer startMusic(Song song, List<Song> queue) {
+        Uri uri = Uri.parse(song.getURLmp3());
+        currentSong = song;
+        queueSong = queue;
+        initMusic(uri);
+        return mediaPlayer;
+
+    }
+    public void initMusic(Uri uri){
+
+        if(mediaPlayer == null){
+            mediaPlayer = new MediaPlayer();
+        } else {
+            mediaPlayer.reset();
+        }
+
+        try {
+            mediaPlayer.setDataSource(getApplicationContext(), uri);
+            mediaPlayer.prepareAsync();
+            mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mp) {
+                    mp.start();
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
 
     public void pauseMusic() {
         if(mediaPlayer != null && mediaPlayer.isPlaying()){
@@ -195,6 +207,24 @@ public class MusicService extends Service {
             mediaPlayer.start();
         }
     }
+    public Song nextMusic(){
+        if(mediaPlayer != null && mediaPlayer.isPlaying()){
+            int pos=this.queueSong.indexOf(currentSong);
+            currentSong=this.queueSong.get((pos+1)%this.queueSong.size());
+            Uri uri = Uri.parse(currentSong.getURLmp3());
+            initMusic(uri);
+        }
+        return currentSong;
+    }
+    public Song prevMusic(){
+        if(mediaPlayer != null && mediaPlayer.isPlaying()){
+            int pos=this.queueSong.indexOf(currentSong);
+            currentSong=this.queueSong.get((pos-1+this.queueSong.size())%this.queueSong.size());
+            Uri uri = Uri.parse(currentSong.getURLmp3());
+            initMusic(uri);
+        }
+        return currentSong;
+    }
     public void stopMusic() {
         if(mediaPlayer != null && mediaPlayer.isPlaying()){
             mediaPlayer.stop();
@@ -203,18 +233,19 @@ public class MusicService extends Service {
         }
     }
 
-    private void playPreviousSong() {
+    public void playPreviousSong() {
         Intent intent = new Intent(this, MusicFragment.class);
         intent.setAction("ACTION_PREVIOUS");
         startActivity(intent);
     }
-
-    private void playNextSong() {
+    public void playNextSong() {
         Intent intent = new Intent(this, MusicFragment.class);
         intent.setAction("ACTION_NEXT");
         startActivity(intent);
     }
-
+    public void setQueueSong(List<Song> queueSong) {
+        this.queueSong = queueSong;
+    }
     @Override
     public void onDestroy() {
         super.onDestroy();

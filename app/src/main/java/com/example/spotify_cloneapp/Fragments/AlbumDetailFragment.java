@@ -80,10 +80,7 @@ public class AlbumDetailFragment extends Fragment {
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
-            int idAlbum = getArguments().getInt("idAlbum", 0);
-            // Sử dụng idAlbum để lấy dữ liệu album và bài hát
-            loadAlbumData(idAlbum);
-            loadSongsData(idAlbum);
+
         }
     }
 
@@ -93,6 +90,10 @@ public class AlbumDetailFragment extends Fragment {
         // Inflate the layout for this fragment
         View v = inflater.inflate(R.layout.fragment_album_detail, container, false);
         loadComponent(v);
+        int idAlbum = getArguments().getInt("idAlbum", 0);
+        // Sử dụng idAlbum để lấy dữ liệu album và bài hát
+        loadAlbumData(idAlbum);
+        loadSongsData(idAlbum);
         return v;
     }
 
@@ -100,7 +101,9 @@ public class AlbumDetailFragment extends Fragment {
         Service.api.getAlbumById(idAlbum).enqueue(new Callback<List<Album>>() {
             @Override
             public void onResponse(Call<List<Album>> call, Response<List<Album>> response) {
-                if(response.body().size() > 0) {
+                if(response.code()==500){
+                    loadAlbumData(idAlbum);
+                } else if(response.body().size() > 0) {
                     album = response.body().get(0);
                     loadData();
                 }
@@ -117,10 +120,15 @@ public class AlbumDetailFragment extends Fragment {
         Service.api.getSongsByAlbum(idAlbum).enqueue(new Callback<List<Song>>() {
             @Override
             public void onResponse(Call<List<Song>> call, Response<List<Song>> response) {
-                List<Song> songs = response.body();
-                songsOfAlbumAdapter.setSongList(songs);
-                saveQueueofSongs(songs);
-                songsOfAlbumAdapter.notifyDataSetChanged();
+                if(response.code()==500){
+                    loadSongsData(idAlbum);
+                }
+                else{
+                    List<Song> songs = response.body();
+                    songsOfAlbumAdapter.setSongList(songs);
+                    saveQueueofSongs(songs);
+                    songsOfAlbumAdapter.notifyDataSetChanged();
+                }
             }
 
             @Override

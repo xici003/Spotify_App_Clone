@@ -1,6 +1,7 @@
 package com.example.spotify_cloneapp.Fragments;
 
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.method.ScrollingMovementMethod;
@@ -15,7 +16,9 @@ import androidx.fragment.app.Fragment;
 
 import com.example.spotify_cloneapp.MainActivity;
 import com.example.spotify_cloneapp.Models.Song;
+import com.example.spotify_cloneapp.MusicService;
 import com.example.spotify_cloneapp.R;
+import com.squareup.picasso.Picasso;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -41,15 +44,17 @@ public class MusicFragment extends Fragment {
     private ImageView imgBack;
     private Song song;
     private Handler handler = new Handler();
+    private MusicService musicService;
 
-    public MusicFragment(Song song, MediaPlayer mediaPlayer) {
+    public MusicFragment(Song song, MusicService musicService) {
         this.song = song;
-        this.mediaPlayer = mediaPlayer;
+        this.musicService = musicService;
+        mediaPlayer=musicService.getMediaPlayer();
     }
 
     // TODO: Rename and change types and number of parameters
-    public static MusicFragment newInstance(String param1, String param2, Song song) {
-        MusicFragment fragment = new MusicFragment(song, mediaPlayer);
+    public static MusicFragment newInstance(String param1, String param2, Song song, MusicService musicService) {
+        MusicFragment fragment = new MusicFragment(song, musicService);
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -73,7 +78,6 @@ public class MusicFragment extends Fragment {
         View view =  inflater.inflate(R.layout.fragment_musicplayer_view, container, false);
         this.loadComponent(view);
         this.loadData(song);
-        this.loadAction();
         return view;
     }
 
@@ -82,16 +86,14 @@ public class MusicFragment extends Fragment {
         artistName.setText(song.getNameArtist());
         lyrics.setText(song.getLyrics());
         durationTotal.setText(song.getDuration());
-    }
-
-    private void loadAction() {
+        Picasso.get().load(Uri.parse(song.getThumbnail())).placeholder(R.drawable.hinhnen).into(imgSong);
         seekBarAction();
     }
+
 
     private void seekBarAction() {
         if (mediaPlayer != null) {
             seekBar.setMax(mediaPlayer.getDuration() / 1000);  // Chỉ đặt max nếu MediaPlayer không null
-
             seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -110,10 +112,8 @@ public class MusicFragment extends Fragment {
                     handler.post(updateSeekBar);
                 }
             });
-
             handler.postDelayed(updateSeekBar, 1000);  // Bắt đầu cập nhật SeekBar
             getActivity().runOnUiThread(updateSeekBar);
-//            durationTotal.setText(song.getDuration());
         }
     }
     private Runnable updateSeekBar = new Runnable() {
@@ -159,21 +159,38 @@ public class MusicFragment extends Fragment {
         lyrics.setMovementMethod(new ScrollingMovementMethod());
         imgBack = view.findViewById(R.id.MV_iconBack);
         setBtnNextandPre();
+        setPlayPauseBtnAction();
+    }
 
-//        setImgBack();
+    private void setPlayPauseBtnAction() {
+        this.playPauseBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mediaPlayer.isPlaying()) {
+                    musicService.pauseMusic();
+                    playPauseBtn.setImageResource(R.drawable.play2_icon);
+                } else {
+                    musicService.continueMusic();
+                    playPauseBtn.setImageResource(R.drawable.pause_icon);
+                }
+            }
+        });
     }
 
     private void setBtnNextandPre() {
         nextBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                nextSong();
+                song=musicService.nextMusic();
+                loadData(song);
+
             }
         });
         prevBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                prevSong();
+                song=musicService.prevMusic();
+                loadData(song);
             }
         });
     }
