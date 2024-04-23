@@ -13,6 +13,7 @@ import android.content.IntentFilter;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.widget.ImageView;
@@ -124,7 +125,13 @@ public class MusicService extends Service {
         intentFilter.addAction("com.example.spotify_cloneapp.ACTION_PAUSE_MUSIC");
         intentFilter.addAction("com.example.spotify_cloneapp.ACTION_PREVIOUS");
         intentFilter.addAction("com.example.spotify_cloneapp.ACTION_NEXT");
-        registerReceiver(broadcastReceiver, intentFilter);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            // For Android 12 (API level 31) and above, use the flag RECEIVER_NOT_EXPORTED
+            registerReceiver(broadcastReceiver, intentFilter, Context.RECEIVER_NOT_EXPORTED);
+        } else {
+            // For below Android 12, use the original method
+            registerReceiver(broadcastReceiver, intentFilter);
+        }
     }
 
     private void sendNotification(Song song) {

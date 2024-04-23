@@ -1,4 +1,4 @@
-﻿create database MusicApp
+﻿--create database MusicApp
 use MusicApp
 CREATE TABLE Account (
   ID_Acc int NOT NULL PRIMARY KEY,
@@ -8,26 +8,21 @@ CREATE TABLE Account (
   Password varchar(50) NOT NULL
 );
 
-select * from Account
 
-insert into Account(Email, Name, Password, Thumbnail) values(N'a', 'a', '123', '')
-
-Alter TRIGGER insertAccount
-ON Account
-INSTEAD OF INSERT
-AS
-BEGIN
-    -- Tìm ID lớn nhất hiện tại trong bảng Account
-    DECLARE @max_id int;
-    SELECT @max_id = ISNULL(MAX(ID_Acc), 0) FROM Account;
+--Alter TRIGGER insertAccount
+--ON Account
+--INSTEAD OF INSERT
+--AS
+--BEGIN
+--    -- Tìm ID lớn nhất hiện tại trong bảng Account
+--    DECLARE @max_id int;
+--    SELECT @max_id = ISNULL(MAX(ID_Acc), 0) FROM Account;
     
-    -- Chèn dữ liệu mới với ID_Acc được tăng lên
-    INSERT INTO Account (ID_Acc, Email, Name, Thumbnail, Password)
-    SELECT @max_id + ROW_NUMBER() OVER(ORDER BY (SELECT NULL)), Email, Name, Thumbnail, Password
-    FROM inserted;
-END;
-
-
+--    -- Chèn dữ liệu mới với ID_Acc được tăng lên
+--    INSERT INTO Account (ID_Acc, Email, Name, Thumbnail, Password)
+--    SELECT @max_id + ROW_NUMBER() OVER(ORDER BY (SELECT NULL)), Email, Name, Thumbnail, Password
+--    FROM inserted;
+--END;
 
 CREATE TABLE Album (
   ID_Album int NOT NULL PRIMARY KEY,
@@ -45,36 +40,6 @@ CREATE TABLE Author (
   Name nvarchar(255) NOT NULL,
   Thumbnail varchar(255) NULL
 );
-CREATE TABLE PairSongArtist (
-  ID_Song int NOT NULL,
-  ID_Artist int NOT NULL,
-  PRIMARY KEY (ID_Song, ID_Artist),
-  FOREIGN KEY (ID_Song) REFERENCES Song(ID_Song),
-  FOREIGN KEY (ID_Artist) REFERENCES Artist(ID_Artist)
-);
-
-CREATE TABLE PairSongPlaylist (
-  ID_Song int NOT NULL,
-  ID_Playlist int NOT NULL,
-  PRIMARY KEY (ID_Song, ID_Playlist),
-  FOREIGN KEY (ID_Song) REFERENCES Song(ID_Song),
-  FOREIGN KEY (ID_Playlist) REFERENCES Playlist(ID_Playlist)
-);
-CREATE TABLE Playlist (
-  ID_Playlist int NOT NULL PRIMARY KEY,
-  ID_Acc int NULL,
-  Name nvarchar(255) NOT NULL,
-  Description nvarchar(255) NULL,
-  Thumbnail varchar(255) NULL,
-  FOREIGN KEY (ID_Acc) REFERENCES Account(ID_Acc)
-);
-
-CREATE TABLE SearchHistory (
-  Query nvarchar(255) NOT NULL,
-  ID_Acc int NOT NULL,
-  FOREIGN KEY (ID_Acc) REFERENCES Account(ID_Acc)
-);
-
 CREATE TABLE Song (
   ID_Song int NOT NULL PRIMARY KEY,
   Thumbnail varchar(255) NULL,
@@ -90,60 +55,88 @@ CREATE TABLE Song (
   FOREIGN KEY (ID_Artist) REFERENCES Artist(ID_Artist),
   FOREIGN KEY (ID_Album) REFERENCES Album(ID_Album)
 );
+CREATE TABLE Playlist (
+  ID_Playlist int NOT NULL PRIMARY KEY,
+  ID_Acc int NULL,
+  Name nvarchar(255) NOT NULL,
+  Description nvarchar(255) NULL,
+  Thumbnail varchar(255) NULL,
+  FOREIGN KEY (ID_Acc) REFERENCES Account(ID_Acc)
+);
+CREATE TABLE PairSongArtist (
+  ID_Song int NOT NULL,
+  ID_Artist int NOT NULL,
+  PRIMARY KEY (ID_Song, ID_Artist),
+  FOREIGN KEY (ID_Song) REFERENCES Song(ID_Song),
+  FOREIGN KEY (ID_Artist) REFERENCES Artist(ID_Artist)
+);
+CREATE TABLE PairSongPlaylist (
+  ID_Song int NOT NULL,
+  ID_Playlist int NOT NULL,
+  PRIMARY KEY (ID_Song, ID_Playlist),
+  FOREIGN KEY (ID_Song) REFERENCES Song(ID_Song),
+  FOREIGN KEY (ID_Playlist) REFERENCES Playlist(ID_Playlist)
+);
+CREATE TABLE SearchHistory (
+  Query nvarchar(255) NOT NULL,
+  ID_Acc int NOT NULL,
+  FOREIGN KEY (ID_Acc) REFERENCES Account(ID_Acc)
+);
 
-Select Song.*, Artist.Name as nameArtist, Artist.Thumbnails from Song inner join Artist on Song.ID = Artist.ID_Artist where ID_Album = 2
-
-INSERT INTO Account(ID_Acc, Email, Name, Thumbnail, Password) VALUES (1, 'ttnam22@gmail.com', N'Trịnh Nam', 'https://spotifybygoats.000webhostapp.com/Image/account/001.jpg', '123456A')
-INSERT INTO Account(ID_Acc, Email, Name, Thumbnail, Password) VALUES (2, 'chientran@gmail.com', N'Trần Chiến', 'https://spotifybygoats.000webhostapp.com/Image/local_playlist/001.jpg', '123456A')
 
 
-insert into Album(ID_Album, Name, Description, Thumbnail) VALUES (1, N'Gấp', N'Album nhạc của Cá Hồi Hoang', 'https://spotifybygoats.000webhostapp.com/Image/album/Gap.png');
-insert into Album(ID_Album, Name, Description, Thumbnail) VALUES (2, N'Qua Khung Cửa Sổ ', N'Album của Chillies', 'https://spotifybygoats.000webhostapp.com/Image/album/QuaKhungCuaSo.png');
-insert into Album(ID_Album, Name, Description, Thumbnail) VALUES (3, N'Dealth Magnetic ', N'Death is here', 'https://spotifybygoats.000webhostapp.com/Image/album/DeathMagnetic.jpg');
-insert into Album(ID_Album, Name, Description, Thumbnail) VALUES (4, N'Daily Mix 1', N'Daily Mix 1', 'https://spotifybygoats.000webhostapp.com/Image/album/QuaKhungCuaSo.png');
-insert into Album(ID_Album, Name, Description, Thumbnail) VALUES (5, N'Daily Mix 2', N'Daily Mix 2', 'https://spotifybygoats.000webhostapp.com/Image/song/GheIuDau.jpg');
 
-insert into Artist(ID_Artist, Name, Thumbnails) values (1, N'Metallica', 'https://spotifybygoats.000webhostapp.com/Image/artist/001.jpg');
-insert into Artist(ID_Artist, Name, Thumbnails) values (2, N'Kendrick Lamar', 'https://spotifybygoats.000webhostapp.com/Image/artist/002.jpg');
-insert into Artist(ID_Artist, Name, Thumbnails) values (3, N'tlinh', 'https://spotifybygoats.000webhostapp.com/Image/artist/tlinh.jpg');
-insert into Artist(ID_Artist, Name, Thumbnails) values (4, N'Chillies', 'https://spotifybygoats.000webhostapp.com/Image/artist/004.jpg');
-insert into Artist(ID_Artist, Name, Thumbnails) values (5, N'Cá Hồi Hoang', 'https://spotifybygoats.000webhostapp.com/Image/artist/cahoihoang.jpg');
-insert into Artist(ID_Artist, Name, Thumbnails) values (6, N'Bức Tường', 'https://spotifybygoats.000webhostapp.com/Image/artist/005.jpg');
-insert into Artist(ID_Artist, Name, Thumbnails) values (7, N'Lý Bực', 'https://spotifybygoats.000webhostapp.com/Image/artist/006.jpg');
+INSERT INTO Account(ID_Acc, Email, Name, Thumbnail, Password) VALUES (1, 'ttnam22@gmail.com', N'Trịnh Nam', 'https://myspotifyit1.000webhostapp.com/Image/account/001.jpg', '123456A')
+INSERT INTO Account(ID_Acc, Email, Name, Thumbnail, Password) VALUES (2, 'chientran@gmail.com', N'Trần Chiến', 'https://myspotifyit1.000webhostapp.com/Image/local_playlist/001.jpg', '123456A')
 
-insert into Author(ID_Author, Name, Thumbnail) values (1, N'Metallica', 'https://spotifybygoats.000webhostapp.com/Image/artist/001.jpg');
-insert into Author(ID_Author, Name, Thumbnail) values (2, N'Kendrick Lamar', 'https://spotifybygoats.000webhostapp.com/Image/artist/002.jpg');
-insert into Author(ID_Author, Name, Thumbnail) values (3, N'tlinh', 'https://spotifybygoats.000webhostapp.com/Image/artist/tlinh.jpg');
-insert into Author(ID_Author, Name, Thumbnail) values (4, N'Chillies', 'https://spotifybygoats.000webhostapp.com/Image/artist/004.jpg');
-insert into Author(ID_Author, Name, Thumbnail) values (5, N'Cá Hồi Hoang', 'https://spotifybygoats.000webhostapp.com/Image/artist/cahoihoang.jpg');
-insert into Author(ID_Author, Name, Thumbnail) values (6, N'Lý Bực', 'https://spotifybygoats.000webhostapp.com/Image/artist/006.jpg');
-insert into Author(ID_Author, Name, Thumbnail) values (7, N'Bức Tường', 'https://spotifybygoats.000webhostapp.com/Image/artist/005.jpg');
+
+insert into Album(ID_Album, Name, Description, Thumbnail) VALUES (1, N'Gấp', N'Album nhạc của Cá Hồi Hoang', 'https://myspotifyit1.000webhostapp.com/Image/album/Gap.png');
+insert into Album(ID_Album, Name, Description, Thumbnail) VALUES (2, N'Qua Khung Cửa Sổ ', N'Album của Chillies', 'https://myspotifyit1.000webhostapp.com/Image/album/QuaKhungCuaSo.png');
+insert into Album(ID_Album, Name, Description, Thumbnail) VALUES (3, N'Dealth Magnetic ', N'Death is here', 'https://myspotifyit1.000webhostapp.com/Image/album/DeathMagnetic.jpg');
+insert into Album(ID_Album, Name, Description, Thumbnail) VALUES (4, N'Daily Mix 1', N'Daily Mix 1', 'https://myspotifyit1.000webhostapp.com/Image/album/QuaKhungCuaSo.png');
+insert into Album(ID_Album, Name, Description, Thumbnail) VALUES (5, N'Daily Mix 2', N'Daily Mix 2', 'https://myspotifyit1.000webhostapp.com/Image/song/GheIuDau.jpg');
+
+insert into Artist(ID_Artist, Name, Thumbnails) values (1, N'Metallica', 'https://myspotifyit1.000webhostapp.com/Image/artist/001.jpg');
+insert into Artist(ID_Artist, Name, Thumbnails) values (2, N'Kendrick Lamar', 'https://myspotifyit1.000webhostapp.com/Image/artist/002.jpg');
+insert into Artist(ID_Artist, Name, Thumbnails) values (3, N'tlinh', 'https://myspotifyit1.000webhostapp.com/Image/artist/tlinh.jpg');
+insert into Artist(ID_Artist, Name, Thumbnails) values (4, N'Chillies', 'https://myspotifyit1.000webhostapp.com/Image/artist/004.jpg');
+insert into Artist(ID_Artist, Name, Thumbnails) values (5, N'Cá Hồi Hoang', 'https://myspotifyit1.000webhostapp.com/Image/artist/cahoihoang.jpg');
+insert into Artist(ID_Artist, Name, Thumbnails) values (6, N'Bức Tường', 'https://myspotifyit1.000webhostapp.com/Image/artist/005.jpg');
+insert into Artist(ID_Artist, Name, Thumbnails) values (7, N'Lý Bực', 'https://myspotifyit1.000webhostapp.com/Image/artist/006.jpg');
+
+insert into Author(ID_Author, Name, Thumbnail) values (1, N'Metallica', 'https://myspotifyit1.000webhostapp.com/Image/artist/001.jpg');
+insert into Author(ID_Author, Name, Thumbnail) values (2, N'Kendrick Lamar', 'https://myspotifyit1.000webhostapp.com/Image/artist/002.jpg');
+insert into Author(ID_Author, Name, Thumbnail) values (3, N'tlinh', 'https://myspotifyit1.000webhostapp.com/Image/artist/tlinh.jpg');
+insert into Author(ID_Author, Name, Thumbnail) values (4, N'Chillies', 'https://myspotifyit1.000webhostapp.com/Image/artist/004.jpg');
+insert into Author(ID_Author, Name, Thumbnail) values (5, N'Cá Hồi Hoang', 'https://myspotifyit1.000webhostapp.com/Image/artist/cahoihoang.jpg');
+insert into Author(ID_Author, Name, Thumbnail) values (6, N'Lý Bực', 'https://myspotifyit1.000webhostapp.com/Image/artist/006.jpg');
+insert into Author(ID_Author, Name, Thumbnail) values (7, N'Bức Tường', 'https://myspotifyit1.000webhostapp.com/Image/artist/005.jpg');
 
 
 insert into Song(ID_Song, Thumbnail, URLmp3, Name, ViewCount, Description, Lyrics, ID_Album, ID_Artist, ID_Author) 
-values(1, 'https://spotifybygoats.000webhostapp.com/Image/song/AllNightmareLong.jpg',
-'https://spotifybygoats.000webhostapp.com/Song/AllNightmareLong.mp3', N'All Nightmare Long', 210, N'Just a nightmare', N'All nightmare long', 1, 1, 1);
+values(1, 'https://myspotifyit1.000webhostapp.com/Image/song/AllNightmareLong.jpg',
+'https://myspotifyit1.000webhostapp.com/Song/AllNightmareLong.mp3', N'All Nightmare Long', 210, N'Just a nightmare', N'All nightmare long', 1, 1, 1);
 insert into Song(ID_Song, Thumbnail, URLmp3, Name, ViewCount, Description, Lyrics, ID_Album, ID_Artist, ID_Author) 
-values(2, 'https://spotifybygoats.000webhostapp.com/Image/song/ThatWasJustYourLife.jpg',
-'https://spotifybygoats.000webhostapp.com/Song/ThatWasJustYourLife.mp3', 'That was just your life', 10, 'Just your life', 'That just your life', 1, 1, 1);
+values(2, 'https://myspotifyit1.000webhostapp.com/Image/song/ThatWasJustYourLife.jpg',
+'https://myspotifyit1.000webhostapp.com/Song/ThatWasJustYourLife.mp3', 'That was just your life', 10, 'Just your life', 'That just your life', 1, 1, 1);
 insert into Song(ID_Song, Thumbnail, URLmp3, Name, ViewCount, Description, Lyrics, ID_Album, ID_Artist, ID_Author) 
-values(3, 'https://spotifybygoats.000webhostapp.com/Image/song/BrokenBeatAndScarred.jpg',
-'https://spotifybygoats.000webhostapp.com/Song/BrokenBeatAndScarred.mp3', 'Broken Beat and Scarred', 10, 'Broken Beat and Scarred', 'Broken Beat and Scarred', 1, 1, 1);
+values(3, 'https://myspotifyit1.000webhostapp.com/Image/song/BrokenBeatAndScarred.jpg',
+'https://myspotifyit1.000webhostapp.com/Song/BrokenBeatAndScarred.mp3', 'Broken Beat and Scarred', 10, 'Broken Beat and Scarred', 'Broken Beat and Scarred', 1, 1, 1);
 insert into Song(ID_Song, Thumbnail, URLmp3, Name, ViewCount, Description, Lyrics, ID_Album, ID_Artist, ID_Author) 
-values(4, 'https://spotifybygoats.000webhostapp.com/Image/song/TheDayThatNeverComes.jpg',
-'https://spotifybygoats.000webhostapp.com/Song/TheDayThatNeverComes.mp3', 'The Day That Never Comes', 112, 'The Day That Never Comes', 'The Day That Never Comes', 1, 1, 1);
+values(4, 'https://myspotifyit1.000webhostapp.com/Image/song/TheDayThatNeverComes.jpg',
+'https://myspotifyit1.000webhostapp.com/Song/TheDayThatNeverComes.mp3', 'The Day That Never Comes', 112, 'The Day That Never Comes', 'The Day That Never Comes', 1, 1, 1);
 insert into Song(ID_Song, Thumbnail, URLmp3, Name, ViewCount, Description, Lyrics, ID_Album, ID_Artist, ID_Author) 
-values(5, 'https://spotifybygoats.000webhostapp.com/Image/song/UnitedInGrief.jpg',
-'https://spotifybygoats.000webhostapp.com/Song/UnitedInGrief.mp3', 'United In Grief', 90, 'Humble', 'Humble', 2, 2, 2);
+values(5, 'https://myspotifyit1.000webhostapp.com/Image/song/UnitedInGrief.jpg',
+'https://myspotifyit1.000webhostapp.com/Song/UnitedInGrief.mp3', 'United In Grief', 90, 'Humble', 'Humble', 2, 2, 2);
 insert into Song(ID_Song, Thumbnail, URLmp3, Name, ViewCount, Description, Lyrics, ID_Album, ID_Artist, ID_Author) 
-values(6, 'https://spotifybygoats.000webhostapp.com/Image/song/N95.jpg',
-'https://spotifybygoats.000webhostapp.com/Song/N95.mp3', 'N95', 90, 'N95', 'N95', 2, 2, 2);
+values(6, 'https://myspotifyit1.000webhostapp.com/Image/song/N95.jpg',
+'https://myspotifyit1.000webhostapp.com/Song/N95.mp3', 'N95', 90, 'N95', 'N95', 2, 2, 2);
 insert into Song(ID_Song, Thumbnail, URLmp3, Name, ViewCount, Description, Lyrics, ID_Album, ID_Artist, ID_Author) 
-values(7, 'https://spotifybygoats.000webhostapp.com/Image/song/WorldwideSteppers.jpg',
-'https://spotifybygoats.000webhostapp.com/Song/WorldwideSteppers.mp3', 'Worldwide Steppers', 100, 'Worldwide Steppers', 'Worldwide Steppers', 2, 2, 2);
+values(7, 'https://myspotifyit1.000webhostapp.com/Image/song/WorldwideSteppers.jpg',
+'https://myspotifyit1.000webhostapp.com/Song/WorldwideSteppers.mp3', 'Worldwide Steppers', 100, 'Worldwide Steppers', 'Worldwide Steppers', 2, 2, 2);
 insert into Song(ID_Song, Thumbnail, URLmp3, Name, ViewCount, Lyrics, Description, ID_Album, ID_Artist, ID_Author) 
-values(8, 'https://spotifybygoats.000webhostapp.com/Image/song/GheIuDau.jpg',
-'https://spotifybygoats.000webhostapp.com/Song/GheIuDau.mp3', N'Ghệ iu dấu của em ơi', 200, N'ghệ iu dấu của em ơi
+values(8, 'https://myspotifyit1.000webhostapp.com/Image/song/GheIuDau.jpg',
+'https://myspotifyit1.000webhostapp.com/Song/GheIuDau.mp3', N'Ghệ iu dấu của em ơi', 200, N'ghệ iu dấu của em ơi
 ghệ iu dấu của em ơi
 ghệ có bik em cần ghệ
 ghệ có muốn mình cặp kè?
@@ -210,8 +203,8 @@ em sẽ làm hết trong khả năng
 chỉ cần là mình vẫn có thời gian', 'Worldwide Steppers', 3, 3, 3);
 
 insert into Song(ID_Song, Thumbnail, URLmp3, Name, ViewCount, Lyrics, Description, ID_Album, ID_Artist, ID_Author) 
-values(9, 'https://spotifybygoats.000webhostapp.com/Image/song/VungKyUc.jpg',
-'https://spotifybygoats.000webhostapp.com/Song/VungKyUc.mp3', N'Vùng Ký Ức', 123, N'Trên phím đàn
+values(9, 'https://myspotifyit1.000webhostapp.com/Image/song/VungKyUc.jpg',
+'https://myspotifyit1.000webhostapp.com/Song/VungKyUc.mp3', N'Vùng Ký Ức', 123, N'Trên phím đàn
 Em bỏ lại ngày tháng bạc màu
 Em bỏ lại nỗi nhớ ngày đầu
 Em quên một câu nói
@@ -268,8 +261,8 @@ Và ta thức dậy như đã lớn
 Thôi giấc mơ trôi đi
 Em có quên đôi khi một mai', 'Vung Ky Uc', 4, 4, 4);
 insert into Song(ID_Song, Thumbnail, URLmp3, Name, ViewCount, Lyrics, Description, ID_Album, ID_Artist, ID_Author) 
-values(10, 'https://spotifybygoats.000webhostapp.com/Image/song/BaoNhieu.jpg',
-'https://spotifybygoats.000webhostapp.com/Song/BaoNhieu.mp3', N'Bao Nhiêu', 342, N'[Verse 1]
+values(10, 'https://myspotifyit1.000webhostapp.com/Image/song/BaoNhieu.jpg',
+'https://myspotifyit1.000webhostapp.com/Song/BaoNhieu.mp3', N'Bao Nhiêu', 342, N'[Verse 1]
 Có bao nhiêu người đến
 Em đang chôn mình trong hàng trăm bức hình
 Trong hàng trăm vô tình
@@ -300,8 +293,8 @@ Tôi không muốn chết thêm một lần, chết thêm một lần
 Chết thêm một lần
 ', 'Bao Nhiêu', 4, 4, 4);
 insert into Song(ID_Song, Thumbnail, URLmp3, Name, ViewCount, Lyrics, Description, ID_Album, ID_Artist, ID_Author) 
-values(11, 'https://spotifybygoats.000webhostapp.com/Image/song/EmDungKhoc.jpg',
-'https://spotifybygoats.000webhostapp.com/Song/EmDungKhoc.mp3', N'Em Đừng Khóc', 342, N'Tối em vội lên trên chuyến xe về nơi thiên đường
+values(11, 'https://myspotifyit1.000webhostapp.com/Image/song/EmDungKhoc.jpg',
+'https://myspotifyit1.000webhostapp.com/Song/EmDungKhoc.mp3', N'Em Đừng Khóc', 342, N'Tối em vội lên trên chuyến xe về nơi thiên đường
 Mắt em chợt cay khi nhớ một người từng thương
 Kính xe vừa thay áo mới sau cơn mưa rào
 Tay em vội lau những xót xa trên má đào
@@ -361,8 +354,8 @@ Nếu lòng mình đau vì một người
 Em đừng khóc
 Và em đừng khóc', 'Em Dung Khoc', 4, 4, 4);
 insert into Song(ID_Song, Thumbnail, URLmp3, Name, ViewCount, Lyrics, Description, ID_Album, ID_Artist, ID_Author) 
-values(12, 'https://spotifybygoats.000webhostapp.com/Image/song/GiaNhu.png',
-'https://spotifybygoats.000webhostapp.com/Song/GiaNhu-Chillies.mp3', N'Giá Như', 432, N'Verse 1]
+values(12, 'https://myspotifyit1.000webhostapp.com/Image/song/GiaNhu.png',
+'https://myspotifyit1.000webhostapp.com/Song/GiaNhu-Chillies.mp3', N'Giá Như', 432, N'Verse 1]
 Giá như không phải nói một câu "giá như"
 Trái tim này tặng em từ đầu được chứ?
 Thấy những khung hình quay đều như cuốn phim
@@ -396,8 +389,8 @@ Khi đã lỡ đặt dấu chấm hết cho vơi đi, vơi nỗi đau còn lại
 
 select * from Song
 insert into Song(ID_Song, Thumbnail, URLmp3, Name, ViewCount, Lyrics, Description, ID_Album, ID_Artist, ID_Author) 
-values(13, 'https://spotifybygoats.000webhostapp.com/Image/song/Ms_May.jpg',
-'https://spotifybygoats.000webhostapp.com/Song/Ms_May.mp3', 'Ms. May', 300, N'[Verse]
+values(13, 'https://myspotifyit1.000webhostapp.com/Image/song/Ms_May.jpg',
+'https://myspotifyit1.000webhostapp.com/Song/Ms_May.mp3', 'Ms. May', 300, N'[Verse]
 Và một chiều anh lang thang nơi góc phố ta hẹn hò
 Anh bơ vơ giữa những chuyến xe vội vã
 Từng ngày dài trôi qua anh đâu biết ta lạc nhau
@@ -459,8 +452,8 @@ Chẳng ai ở bên
 Chiều mưa như ôi lạnh thêm anh vẫn nhớ đến
 Tiếng yêu tháng năm êm đềm', 'May is May', 4, 4, 4);
 insert into Song(ID_Song, Thumbnail, URLmp3, Name, ViewCount, Lyrics, Description, ID_Album, ID_Artist, ID_Author) 
-values(14, 'https://spotifybygoats.000webhostapp.com/Image/song/MongDu.jpg',
-'https://spotifybygoats.000webhostapp.com/Song/MongDu.mp3', N'Mộng Du', 241, N'[Verse 1]
+values(14, 'https://myspotifyit1.000webhostapp.com/Image/song/MongDu.jpg',
+'https://myspotifyit1.000webhostapp.com/Song/MongDu.mp3', N'Mộng Du', 241, N'[Verse 1]
 Có bao giờ
 Em bật khóc trong vô vọng
 Từng lời nói như con dao
@@ -546,8 +539,8 @@ Những áng mây dần bay qua đầu
 Những nhớ thương từng trao về nhau', 'Như một cơn mơ ', 4, 4, 4);
 
 insert into Song(ID_Song, Thumbnail, URLmp3, Name, ViewCount, Lyrics, Description, ID_Album, ID_Artist, ID_Author) 
-values(15, 'https://spotifybygoats.000webhostapp.com/Image/song/QuaKhungCuaSo.jpg',
-'https://spotifybygoats.000webhostapp.com/Song/QuaKhungCuaSo.mp3', N'Qua Khung Cửa Sổ', 352, N'[Verse 1]
+values(15, 'https://myspotifyit1.000webhostapp.com/Image/song/QuaKhungCuaSo.jpg',
+'https://myspotifyit1.000webhostapp.com/Song/QuaKhungCuaSo.mp3', N'Qua Khung Cửa Sổ', 352, N'[Verse 1]
 Không ai đúng không ai sai
 Không tiếng khóc trên mi ai
 Không những thứ tha, van nài
@@ -620,8 +613,8 @@ Những nốt nhạc yêu dấu qua khung cửa sổ
 Qua khung cửa sổ
 Qua khung cửa sổ đi trốn thế gian', 'Bên ngoài cánh cửa sổ', 4, 4, 4);
 insert into Song(ID_Song, Thumbnail, URLmp3, Name, ViewCount, Lyrics, Description, ID_Album, ID_Artist, ID_Author) 
-values(16, 'https://spotifybygoats.000webhostapp.com/Image/song/MotCaiTen.jpg',
-'https://spotifybygoats.000webhostapp.com/Song/MotCaiTen.mp3', N'Một Cái Tên', 435, N'[Verse 1: Duy Khang]
+values(16, 'https://myspotifyit1.000webhostapp.com/Image/song/MotCaiTen.jpg',
+'https://myspotifyit1.000webhostapp.com/Song/MotCaiTen.mp3', N'Một Cái Tên', 435, N'[Verse 1: Duy Khang]
 Phía xa mình
 Nhìn nhau và không nói câu gì
 Vì sau đêm nay chúng ta
@@ -686,8 +679,8 @@ Và dường như đã quên
 Để lại một hành tinh đã chết
 Theo đêm tàn trên đầu môi em thôi nhung nhớ một cái tên', 'Một Cái Tên', 4, 4, 4);
 insert into Song(ID_Song, Thumbnail, URLmp3, Name, ViewCount, Lyrics, Description, ID_Album, ID_Artist, ID_Author) 
-values(17, 'https://spotifybygoats.000webhostapp.com/Image/song/Mascara.jpg',
-'https://spotifybygoats.000webhostapp.com/Song/Mascara.mp3', 'Mascara', 371, N'[Verse 1]
+values(17, 'https://myspotifyit1.000webhostapp.com/Image/song/Mascara.jpg',
+'https://myspotifyit1.000webhostapp.com/Song/Mascara.mp3', 'Mascara', 371, N'[Verse 1]
 Câu tạm biệt em nói trên môi
 Anh biết đây là đêm cuối bên nhau mà thôi
 Nhìn lại từng khoảnh khắc từng tồn tại
@@ -758,8 +751,8 @@ Anh biết đây là đêm cuối ta say mà thôi
 Nhìn lại từng khoảnh khắc từng tồn tại
 Ta từng khờ dại', 'Mascara for youuuu', 4, 4, 4);
 insert into Song(ID_Song, Thumbnail, URLmp3, Name, ViewCount, Lyrics, Description, ID_Album, ID_Artist, ID_Author) 
-values(18, 'https://spotifybygoats.000webhostapp.com/Image/song/DuongChanTroi.jpg',
-'https://spotifybygoats.000webhostapp.com/Song/DuongChanTroi.mp3', N'Đường Chân Trời', 682, N'Em nhìn anh
+values(18, 'https://myspotifyit1.000webhostapp.com/Image/song/DuongChanTroi.jpg',
+'https://myspotifyit1.000webhostapp.com/Song/DuongChanTroi.mp3', N'Đường Chân Trời', 682, N'Em nhìn anh
 Đem yêu dấu kia chôn vào đôi mắt
 Quên thời gian
 Xe lăn bánh ta quên ngày trôi nhanh
@@ -829,8 +822,8 @@ Bỏ những ưu tư trong đời
 Sau lưng ta cần chi
 Đến những thiên đường ta cuồng si', 'Chờ đợi tại đường chân trời', 4, 4, 4);
 insert into Song(ID_Song, Thumbnail, URLmp3, Name, ViewCount, Description, Lyrics, ID_Album, ID_Artist, ID_Author) 
-values(19, 'https://spotifybygoats.000webhostapp.com/Image/song/TangThuong102.jpg',
-'https://spotifybygoats.000webhostapp.com/Song/Tang-Thuong-102-Ca-Hoi-Hoang.mp3', N'Tầng thượng 102', 280, '', N'Nhìn mây bay
+values(19, 'https://myspotifyit1.000webhostapp.com/Image/song/TangThuong102.jpg',
+'https://myspotifyit1.000webhostapp.com/Song/Tang-Thuong-102-Ca-Hoi-Hoang.mp3', N'Tầng thượng 102', 280, '', N'Nhìn mây bay
 Bay đến khu rừng già
 Nhìn ánh sáng trốn phía sau tòa nhà
 Ngày trôi qua nhanh
@@ -857,8 +850,8 @@ Hay ngày còn chưa tới
 Ngày chờ đợi ai về
 Đến đây đón em về', 3, 5, 5);
 insert into Song(ID_Song, Thumbnail, URLmp3, Name, ViewCount, Description, Lyrics, ID_Album, ID_Artist, ID_Author) 
-values(20, 'https://spotifybygoats.000webhostapp.com/Image/song/Gap.jpg',
-'https://spotifybygoats.000webhostapp.com/Song/DungBuon.mp3', N'Đừng buồn', 280, '', N'Tôi mơ thấy mình thoả hiệp với một tên khốn cùng vài ba nụ cười vô hồn vô hồn
+values(20, 'https://myspotifyit1.000webhostapp.com/Image/song/Gap.jpg',
+'https://myspotifyit1.000webhostapp.com/Song/DungBuon.mp3', N'Đừng buồn', 280, '', N'Tôi mơ thấy mình thoả hiệp với một tên khốn cùng vài ba nụ cười vô hồn vô hồn
 Liếc mắt nhìn về bên trái còn lại gì còn được gì để mà sai cả chông gai cũng mòn
 Thức dậy trong sợ hãi đếm từng giây và mong ngày mai
 Mình sẽ không bao giờ trở nên như thế
