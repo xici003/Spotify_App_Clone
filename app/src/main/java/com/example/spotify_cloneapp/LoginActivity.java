@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -26,6 +27,7 @@ import retrofit2.Response;
 public class LoginActivity extends AppCompatActivity {
     private EditText edtEmail, edtPassword;
     private Button btnLogin;
+    private LinearLayout btnRegister;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +48,12 @@ public class LoginActivity extends AppCompatActivity {
             }
 
             login(email, password);
+        });
+
+        btnRegister.setOnClickListener(v -> {
+            Intent intent = new Intent(this, Signup.class);
+            startActivity(intent);
+            finish();
         });
     }
 
@@ -92,5 +100,6 @@ public class LoginActivity extends AppCompatActivity {
         edtEmail = findViewById(R.id.edtEmail);
         edtPassword = findViewById(R.id.edtPassword);
         btnLogin = findViewById(R.id.btnLogin);
+        btnRegister = findViewById(R.id.btnRegister);
     }
 }

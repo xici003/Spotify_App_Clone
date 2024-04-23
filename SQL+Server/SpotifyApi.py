@@ -422,20 +422,48 @@ def addAccount():
         thumbnail = flask.request.json.get('Thumbnail')
         password = flask.request.json.get('Password')
 
-        data = (email,name, password,thumbnail)
+        # Kiểm tra xem email đã tồn tại chưa
+        cursor.execute("SELECT * FROM Account WHERE Email = ?", (email))
+        existing_account = cursor.fetchone()
 
-        sql = 'insert into Account(Email, Name, Password, Thumbnail) values(?,?,?,?)'
+        if existing_account:
+            resp = flask.jsonify({'error': 'Email đã tồn tại'})
+            resp.status_code = 409  # HTTP 409 Conflict
+            return resp
 
+        # Nếu không, thêm vào cơ sở dữ liệu
+        sql = 'INSERT INTO Account(Email, Name, Password, Thumbnail) VALUES(?, ?, ?, ?)'
+        data = (email, name, password, thumbnail)
         cursor.execute(sql, data)
         connect.commit()
-        resp = flask.jsonify({'message': 'Thêm account thành công'})
-        resp.status_code = 200
+
+        # Truy vấn lại tài khoản vừa được thêm
+        cursor.execute("SELECT * FROM Account WHERE Email = ?", (email))
+        new_account = cursor.fetchone()
+
+        if new_account:
+            account_info = {
+                'ID_Acc': new_account[0],  # Giá trị của cột ID
+                'Email': new_account[1],  # Giá trị của cột Email
+                'Name': new_account[2],  # Giá trị của cột Name
+                'Password': new_account[3],  # Giá trị của cột Password
+                'Thumbnail': new_account[4],  # Giá trị của cột Thumbnail
+            }
+
+            resp = flask.jsonify({'message': 'Đăng ký thành công', 'account': account_info})
+            resp.status_code = 201  # HTTP 201 Created
+            return resp
+
+        resp = flask.jsonify({'error': 'Không tìm thấy tài khoản vừa thêm'})
+        resp.status_code = 404  # HTTP 404 Not Found
         return resp
+
     except Exception as e:
         print(e)
         resp = flask.jsonify({'error': 'Internal Server Error'})
         resp.status_code = 500
         return resp
+
 
 @app.route('/account/delete/<id>', methods = ['DELETE'])
 def deleteAccount(id):
@@ -453,13 +481,12 @@ def deleteAccount(id):
 @app.route('/account/update/<id>', methods = ['PUT'])
 def updateAccount(id):
     try:
-        idacc = flask.request.json.get('ID_Acc')
         email = flask.request.json.get('Email')
         name = flask.request.json.get('Name')
         thumbnail = flask.request.json.get('Thumbnail')
 
         sql = 'update Account set Email=?, Name=?, Thumbnail=? where ID_Acc = ?'
-        data = (email, name, thumbnail, idacc)
+        data = (email, name, thumbnail, id)
         cursor = connect.cursor()
         cursor.execute(sql,data)
         connect.commit()

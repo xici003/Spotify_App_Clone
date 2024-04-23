@@ -1,0 +1,80 @@
+<!-- res/layout/dialog_update_account.xml -->
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/rounded_corners_background"
+    android:padding="20dp">
+
+    <!-- Email Field -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Email"
+        android:textColor="@color/white"
+        android:textSize="18dp"
+        android:textStyle="bold" />
+    <EditText
+        android:id="@+id/edtUpdateEmail"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:hint="Email"
+        android:textColorHint="@color/lightText"
+        android:textColor="@color/white"
+        android:background="@drawable/edittext_background"
+        android:padding="10dp" />
+
+    <!-- Name Field -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Name"
+        android:textColor="@color/white"
+        android:textSize="18dp"
+        android:textStyle="bold"
+        android:layout_marginTop="20dp" />
+    <EditText
+        android:id="@+id/edtUpdateName"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:hint="Name"
+        android:textColorHint="@color/lightText"
+        android:textColor="@color/white"
+        android:background="@drawable/edittext_background"
+        android:padding="10dp" />
+
+    <!-- Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="20dp">
+
+        <!-- Update Button -->
+        <Button
+            android:id="@+id/btnUpdateProfile"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:text="Update"
+            android:textSize="18dp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:backgroundTint="@color/primary" />
+
+        <!-- Cancel Button -->
+        <Button
+            android:id="@+id/btnCancelProfile"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:text="Cancel"
+            android:textSize="18dp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:backgroundTint="#D3D3D3" />
+
+    </LinearLayout>
+
+</LinearLayout>

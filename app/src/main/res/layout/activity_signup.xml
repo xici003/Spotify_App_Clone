@@ -41,16 +41,15 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="450dp"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         android:background="@drawable/rounded_corners_background"
         android:backgroundTint="@color/baseColor"
-        android:layout_margin="20dp"
-        >
+        android:layout_margin="20dp">
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Email or username"
+            android:text="Email"
             android:textColor="@color/white"
             android:textSize="18dp"
             android:textStyle="bold"
@@ -58,10 +57,35 @@
             android:layout_margin="20dp"/>
 
         <EditText
+            android:id="@+id/edtEmailSignUp"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:hint="Email or username"
+            android:hint="Email"
             android:textColorHint="@color/lightText"
+            android:textSize="18dp"
+            android:textColor="@color/white"
+            android:background="@drawable/edittext_background"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:padding="10dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Name"
+            android:textColor="@color/white"
+            android:textSize="18dp"
+            android:textStyle="bold"
+            android:gravity="left"
+            android:layout_margin="20dp"/>
+
+        <EditText
+            android:id="@+id/edtNameSignUp"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:hint="Name"
+            android:textColorHint="@color/lightText"
+            android:textColor="@color/white"
             android:textSize="18dp"
             android:background="@drawable/edittext_background"
             android:layout_marginLeft="20dp"
@@ -79,11 +103,14 @@
             android:layout_margin="20dp"/>
 
         <EditText
+            android:id="@+id/edtPasswordSignUp"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:hint="Password"
             android:textColorHint="@color/lightText"
             android:textSize="18dp"
+            android:inputType="textPassword"
+            android:textColor="@color/white"
             android:background="@drawable/edittext_background"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
@@ -100,17 +127,21 @@
             android:layout_margin="20dp"/>
 
         <EditText
+            android:id="@+id/edtPasswordComfirmSignUp"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:hint="Confirm Password"
             android:textColorHint="@color/lightText"
             android:textSize="18dp"
+            android:inputType="textPassword"
+            android:textColor="@color/white"
             android:background="@drawable/edittext_background"
             android:layout_marginLeft="20dp"
             android:layout_marginRight="20dp"
             android:padding="10dp" />
 
         <Button
+            android:id="@+id/btnSignUp"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_margin="20dp"
@@ -145,6 +176,4 @@
             />
 
     </LinearLayout>
-
-
 </LinearLayout>

@@ -14,12 +14,14 @@ import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
+import com.example.spotify_cloneapp.InfomationAccount;
 import com.example.spotify_cloneapp.MainActivity;
 import com.example.spotify_cloneapp.Models.Account;
 import com.example.spotify_cloneapp.R;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -98,6 +100,16 @@ public class AccountFragment extends Fragment {
                 e.printStackTrace();
                 Toast.makeText(getContext(), "Có lỗi xảy ra khi đăng xuất", Toast.LENGTH_SHORT).show();
             }
+        });
+
+        btnProfile.setOnClickListener(v->{
+            Intent intent = new Intent(getContext(), InfomationAccount.class);
+            intent.putExtra("account", (Serializable) account);
+
+            // Thêm cờ để xóa hoạt động trước đó khỏi ngăn xếp
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            requireActivity().finish();
         });
     }
 

@@ -1,6 +1,8 @@
 package com.example.spotify_cloneapp.Models;
 
-public class Account {
+import java.io.Serializable;
+
+public class Account implements Serializable {
     int ID_Acc;
     String Email, Name, Thumbnail, Password;
 

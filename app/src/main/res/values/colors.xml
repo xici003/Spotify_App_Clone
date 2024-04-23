@@ -6,4 +6,5 @@
     <color name="baseColor">#121212</color>
     <color name="backgroundColor">#000</color>
     <color name="lightText">#a7a7a7</color>
+    <color name="red">#F44336</color>
 </resources>
